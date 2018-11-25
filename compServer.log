@@ -1,0 +1,13 @@
+[Thu Nov 22 12:05:46 EST 2018] [INFO] Add Course                              |comp1 fall                              |Add Successful                          |
+[Thu Nov 22 12:05:46 EST 2018] [INFO] Add Course                              |comp2 fall                              |Add Successful                          |
+[Thu Nov 22 12:05:50 EST 2018] [INFO] Client Send Request                     |dropRemovedCourseFromStuCourList comp1  |
+[Thu Nov 22 12:05:50 EST 2018] [INFO] Client Recv Response                    |Remove Successful                       |
+[Thu Nov 22 12:05:50 EST 2018] [INFO] Client Send Request                     |dropRemovedCourseFromStuCourList comp1  |
+[Thu Nov 22 12:05:50 EST 2018] [INFO] Client Recv Response                    |Remove Successful                       |
+[Thu Nov 22 12:05:50 EST 2018] [INFO] Remove Course                           |comp1 fall                              | Remove Successful                      |
+[Thu Nov 22 12:07:31 EST 2018] [INFO] Remove Course                           |comp1 fall                              |The Course Doesn't Exist                |
+[Thu Nov 22 12:07:31 EST 2018] [INFO] List Course Availability                |fall                                    |
+[Thu Nov 22 12:07:31 EST 2018] [INFO] Client Send Request                     |listCourseAvailability fall             |
+[Thu Nov 22 12:07:31 EST 2018] [INFO] Client Recv Response                    |soen1--2 soen2--2                       |
+[Thu Nov 22 12:07:31 EST 2018] [INFO] Client Send Request                     |listCourseAvailability fall             |
+[Thu Nov 22 12:07:31 EST 2018] [INFO] Client Recv Response                    |inse2--2 inse1--2                       |
