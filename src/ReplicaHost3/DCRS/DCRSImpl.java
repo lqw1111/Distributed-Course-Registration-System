@@ -24,10 +24,10 @@ public class DCRSImpl {
 
     public String swapCourseDropReply(String studentID,String oldCourseID) {
         Course course = this.searchCourse(oldCourseID);
-        if (course == null) return "THE_COURSE_HAS_BEEN_MOVED";
+        if (course == null) return "Swap Fail";
         if(course.drop(studentID))
-            return "SUCCESS";
-        else return "THE_COURSE_HAS_BEEN_MOVED";
+            return "Swap Course Successful";
+        else return "Swap Fail";
     }
 
     public String swapCourseEnrolRequest(String studentID, String newCourseID, String oldCourseID) {
@@ -35,10 +35,10 @@ public class DCRSImpl {
         Course course = this.searchCourse(newCourseID);
         synchronized (course) {
             if (course.isStatusFull())
-                return "THE_COURSE_IS_FULL";
+                return "Swap Fail";
             String[] param = {"swap_drop", studentID,  oldCourseID};
             String res = send(dataProcess(param), oldCourseID.substring(0, 4));
-            if (res.equals("SUCCESS"))
+            if (res.contains("Successful"))
                 course.swapEnrol(studentID);
             return res;
         }
@@ -48,11 +48,11 @@ public class DCRSImpl {
         // check is the new course in the local server
         if (checkDepartment(newCourseID)) {
             // check is the two courses in the same semester
-            if (!checkIsInSameSemester(newCourseID, oldCourseID)) return "NOT_IN_THE_SAME_SEMESTER";
+            if (!checkIsInSameSemester(newCourseID, oldCourseID)) return "Swap Fail";
             // run local course exchange, if success return SUCCESS
             if(!swapLocalCourse(studentID, newCourseID, oldCourseID))
-               return "THE_COURSE_" + newCourseID.toUpperCase() + "_IS_FULL";
-            return "SUCCESS";
+               return "Swap Fail";
+            return "Swap Course Successful";
         }
         String[] param = {"swap_enrol", studentID, newCourseID, oldCourseID};
         String res = this.send(dataProcess(param), newCourseID.substring(0, 4));
@@ -72,25 +72,25 @@ public class DCRSImpl {
         if(student == null)
             students.put(studentID, new Student(studentID));
         if (!student.checkCourse(oldCourseID))
-            return "DON'T_HAVE_THE_SWAPPED_COURSE";
+            return "Swap Fail";
         if (student.checkCourse(newCourseID))
-            return "THE_SWAPPED_COURSE_IS_ALREADY_REGISTERED";
+            return "Swap Fail";
         int numberIfSwap = student.getRemoteCourseNumberIfSwap(oldCourseID, newCourseID);
         if (numberIfSwap > 2)
-            return "OTHER_DEPARTMENT_COURSE_WILL_BE_FULL_IF_SWAP";
+            return "Swap Fail";
         if (numberIfSwap == -1)
-            return "TWO_COURSES_ARE_NOT_IN_THE_SAME_SEMESTER";
+            return "Swap Fail";
         if (checkDepartment(newCourseID) && checkDepartment(oldCourseID)) {
             if (!checkIsInSameSemester(newCourseID, oldCourseID))
-                return "NOT_IN_THE_SAME_SEMESTER";
+                return "Swap Fail";
             if(!swapLocalCourse(studentID, newCourseID, oldCourseID))
-                return "THE_COURSE_" + newCourseID.toUpperCase() + "_IS_FULL";
+                return "Swap Fail";
             student.swapCourse(oldCourseID, newCourseID);
-            return "SUCCESS";
+            return "Swap Course Successful";
         }
         String[] param = {"swap", studentID, newCourseID, oldCourseID};
         String res = this.send(dataProcess(param), oldCourseID.substring(0, 4));
-        if (res.equals("SUCCESS")) {
+        if (res.contains("Successful")) {
             student.swapCourse(oldCourseID, newCourseID);
         }
         return res;
@@ -106,21 +106,28 @@ public class DCRSImpl {
     }
 
     public String addCourse(String courseID, String semester) {
-        if (!courseID.substring(0, 4).equals(this.departmentTag))
+        if (!courseID.substring(0, 4).equals(this.departmentTag)) {
+            logger.info("Add Course:" + courseID + " " + semester + ":" + "Not Authorized");
             return "You Are Not Authorized To Add The Course ";
+        }
         if (!checkCourse(courseID, semester)) {
             synchronized (this) {
                 this.courseSchedule.get(semester).put(courseID, new Course(courseID, 2));
             }
+            logger.info("Add Course:" + courseID + " " + semester + ":" + "Add Successful");
             return "Add Successful";
         }
+        logger.info("Add Course:" + courseID + " " + semester + ":" + "The Course Have Already Added!");
         return "The Course Have Already Added!";
     }
 
     public String removeCourse(String courseID, String semester) {
-        if (!courseID.substring(0, 4).equals(this.departmentTag))
+        if (!courseID.substring(0, 4).equals(this.departmentTag)) {
+            logger.info("Remove Course:" + courseID + " " + semester + ":" + " Not Authorized");
             return "You Are Not Authorized To Add The Course ";
+        }
         if (!checkCourse(courseID, semester)) {
+            logger.info("Remove Course:" + courseID + " " + semester + ":" + "The Course Doesn't Exist");
             return "The Course Doesn't Exist";
         }
         List<String> student_registerred = this.courseSchedule.get(semester).get(courseID).getStudent_registerred();
@@ -139,7 +146,7 @@ public class DCRSImpl {
         synchronized (this) {
             this.courseSchedule.get(semester).remove(courseID);
         }
-
+        logger.info("Remove Course:" + courseID + " " + semester + ":" + " Remove Successful");
         return "Remove Successful";
     }
 
@@ -155,9 +162,14 @@ public class DCRSImpl {
         List<String> list = new ArrayList<>();
         for (String key : DepartmentToPort.map.keySet()) {
             String[] param = {"show_available_courses", semester};
-            list.add(this.send(dataProcess(param), key));
+            String[] units = this.send(dataProcess(param), key).split(" ");
+            for (String unit : units) {
+                list.add(unit);
+            }
         }
-        return (String[]) list.toArray();
+        String[] result = list.toArray(new String[list.size()]);
+        Arrays.sort(result);
+        return result;
     }
 
     public String listCourseAvailabilityInLocal(String semester) {
@@ -169,18 +181,25 @@ public class DCRSImpl {
         return list.stream().map((a) -> a.getCourse_name() + "--" + a.getAvailableSpave()).collect(Collectors.joining(" "));
     }
 
-    public String getClassSchedule(String studentID) {
+    public String[] getClassSchedule(String studentID) {
         if (!students.containsKey(studentID)) {
             students.put(studentID, new Student(studentID));
-            return "YOU_HAVE_NOT_COURSE_REGISTED";
+            return null;
         }
+        logger.info("Get Class Schedule :" + studentID);
         return students.get(studentID).getSchedule();
     }
 
     public String enrolCourse(String studentID, String courseID, String semester)  {
         if (!checkDepartment(studentID)) {
-            if(this.courseSchedule.get(semester).get(courseID).register(studentID)) return "SUCCESS";
-            else return "COURSE_IS_FULL";
+            if(this.courseSchedule.get(semester).get(courseID).register(studentID)) {
+                logger.info("Enroll Course :" + studentID + " " + courseID + " " + semester + ":" + (courseID + " Enroll Successfully"));
+                return (courseID + " Enroll Successfully");
+            }
+            else {
+                logger.info("Enroll Course :" + studentID + " " + courseID + " " + semester + ":" + "Do not allow to enroll");
+                return "Do not allow to enroll";
+            }
         }
         if (!students.containsKey(studentID)) {
             students.put(studentID, new Student(studentID));
@@ -188,60 +207,65 @@ public class DCRSImpl {
         Student student = students.get(studentID);
 
         if (student.checkCourse(courseID, semester)) {
-            return "THE_COURSE_IS_ALREADY_REGISTERED";
+            logger.info("Enroll Course :" + studentID + " " + courseID + " " + semester + ":" + (courseID + " Do not allow to enroll"));
+            return (courseID + " Do not allow to enroll");
         }
         int registedNum = student.getRegistedNum(semester);
         if (registedNum == 3) {
-            return "EXCESS_MAX_NUM_OF_COURSE_IN_THIS_SESSION";
+            logger.info("Enroll Course :" + studentID + " " + courseID + " " + semester + ":" + (courseID + " Do not allow to enroll"));
+            return (courseID + " Do not allow to enroll");
         }
         if (!checkDepartment(courseID)) {
             int remoteCourseNum = student.getRemoteCourseNum(semester);
             if (remoteCourseNum == 2) {
-                return "EXCESS_MAX_NUM_OTHER_DEPARTMENT_COURSE";
+                logger.info("Enroll Course :" + studentID + " " + courseID + " " + semester + ":" + "Do not allow to enroll");
+                return "Do not allow to enroll";
             }
             String[] param = {"enrol", studentID, courseID, semester};
             String res = this.send(dataProcess(param), courseID.substring(0, 4));
-            if (res.equals("SUCCESS")) {
+            if (res.contains("Successfully")) {
                 student.registerCourse(courseID, semester);
-                return courseID + " Enroll Successfully";
             }
+            logger.info("Enroll Course :" + studentID + " " + courseID + " " + semester + ":" + res);
             return res;
         }
 
         if(!this.courseSchedule.get(semester).get(courseID).register(studentID)) {
-            return "COURSE_IS_FULL";
+            logger.info("Enroll Course :" + studentID + " " + courseID + " " + semester + ":" + (courseID + " Do not allow to enroll"));
+            return (courseID + " Do not allow to enroll");
         }
 
         student.registerCourse(courseID, semester);
-        return "SUCCESS";
+        logger.info("Enroll Course :" + studentID + " " + courseID + " " + semester + ":" + (courseID + " Enroll Successfully"));
+        return (courseID + " Enroll Successfully");
     }
 
     public String dropCourse(String studentID, String courseID) {
         Course course = this.searchCourse(courseID);
         if (!checkDepartment(studentID)) {
-            if (course == null) return "SYSTEM_DOES_NOT_HAVE_THE_COURSE";
+//            if (course == null) return "SYSTEM_DOES_NOT_HAVE_THE_COURSE";
             if(course.drop(studentID))
-                return "SUCCESS";
-             else return "DID_NOT_REGISTED_THE_COURSE";
+                return "Drop Successful!";
+             else return "Course Not Found In The Student Course List";
         }
         if (!students.containsKey(studentID)) {
             students.put(studentID, new Student(studentID));
-            return "DID_NOT_REGISTED_THE_COURSE";
+            return "Course Not Found In The Student Course List";
         }
         Student student = students.get(studentID);
         if (!checkDepartment(courseID)) {
             String[] param = {"drop", studentID, courseID};
             String res = this.send(dataProcess(param), courseID.substring(0, 4));
-            if (res.equals("SUCCESS")) {
+            if (res.contains("Successful")) {
                 student.drop(courseID);
             }
             return res;
         }
-        if (course == null) return "SYSTEM_DOES_NOT_HAVE_THE_COURSE";
+//        if (course == null) return "SYSTEM_DOES_NOT_HAVE_THE_COURSE";
         if (course.drop(studentID)) {
             student.drop(courseID);
-            return "SUCCESS";
-        } else return "DID_NOT_REGISTED_THE_COURSE";
+            return "Drop Successful!";
+        } else return "Drop Fail";
     }
 
     private boolean checkCourse(String courseID, String semester) {

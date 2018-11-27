@@ -94,12 +94,16 @@ public class Student {
         }
     }
 
-    public String getSchedule() {
-        String schedule = "\n";
+    public String[] getSchedule() {
+        List<String> list = new ArrayList<>();
         for (Map.Entry<String, List<String>> stringListEntry : courseRegistered.entrySet()) {
-            schedule += stringListEntry.getKey() + " " + stringListEntry.getValue().stream().collect(Collectors.joining(", ")) + "\n";
+            for(String str : stringListEntry.getValue()){
+                list.add(str + "--" + stringListEntry.getKey());
+            }
         }
-        return schedule;
+        String[] result = list.toArray(new String[list.size()]);
+        Arrays.sort(result);
+        return result;
     }
 
 }
