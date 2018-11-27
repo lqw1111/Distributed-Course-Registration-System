@@ -1,72 +1,72 @@
 package ReplicaHost3.DCRS;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Course {
-    public boolean login;
-    public String CourseName;
-    public String semester;
-    public final int capacity = 2;
-    public int enrollNumber;
-    public int availability;
-    public List<String> studentList = new ArrayList<>();
+    private String course_name;
+    private int max_num;
+    private List<String> student_registerred;
 
-    public Course(String courseName, String semester) {
-        CourseName = courseName;
-        this.semester = semester;
+    public Course(String course_name, int max_num) {
+        this.course_name = course_name;
+        this.max_num = max_num;
+        this.student_registerred = new ArrayList<>();
     }
 
-    public boolean isLogin() {
-        return login;
+    public boolean isStatusFull() {
+        if(max_num > student_registerred.size()) return false;
+        else return true;
     }
 
-    public void setLogin(boolean login) {
-        this.login = login;
+    public boolean requestLocalSwap(Course course, String studentID) {
+        return course.getRequestLocationSwap(this, studentID);
     }
 
-    public String getCourseName() {
-        return CourseName;
+    public boolean getRequestLocationSwap(Course course, String studentID) {
+        synchronized (this) {
+            if (this.isStatusFull())
+                return false;
+            course.drop(studentID);
+            return this.register(studentID);
+        }
     }
 
-    public void setCourseName(String courseName) {
-        CourseName = courseName;
+    public void swapEnrol(String studentID) {
+        this.student_registerred.add(studentID);
     }
 
-    public String getSemester() {
-        return semester;
+    public boolean register(String studentID) {
+        synchronized (this) {
+            if (!isStatusFull()) {
+                this.student_registerred.add(studentID);
+                return true;
+            }
+        }
+        return false;
     }
 
-    public void setSemester(String semester) {
-        this.semester = semester;
+    public boolean drop(String studentID) {
+        synchronized (this) {
+            return this.student_registerred.remove(studentID);
+        }
     }
 
-    public int getCapacity() {
-        return capacity;
+    public void clear() {
+        synchronized (this) {
+            this.student_registerred.clear();
+        }
     }
 
-    public int getEnrollNumber() {
-        return enrollNumber;
+    public int getAvailableSpave() {
+        return max_num - student_registerred.size();
     }
 
-    public void setEnrollNumber(int enrollNumber) {
-        this.enrollNumber = enrollNumber;
+    public List<String> getStudent_registerred() {
+        return student_registerred;
     }
 
-    public int getAvailability() {
-        return availability;
-    }
-
-    public void setAvailability(int availability) {
-        this.availability = availability;
-    }
-
-    public List<String> getStudentList() {
-        return studentList;
-    }
-
-    public void setStudentList(List<String> studentList) {
-        this.studentList = studentList;
+    public String getCourse_name() {
+        return course_name;
     }
 }
