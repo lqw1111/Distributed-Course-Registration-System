@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_distributeproject" default="compile.module.distributeproject">
+  <dirname property="module.distributeproject.basedir" file="${ant.file.module_distributeproject}"/>
+  
+  <property name="module.jdk.home.distributeproject" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.distributeproject" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.distributeproject" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.distributeproject" value="-encoding UTF-8 -source 1.8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="distributeproject.output.dir" value="${module.distributeproject.basedir}/out/production/DistributeProject"/>
+  <property name="distributeproject.testoutput.dir" value="${module.distributeproject.basedir}/out/test/DistributeProject"/>
+  
+  <path id="distributeproject.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="distributeproject.module.production.classpath">
+    <path refid="${module.jdk.classpath.distributeproject}"/>
+  </path>
+  
+  <path id="distributeproject.runtime.production.module.classpath">
+    <pathelement location="${distributeproject.output.dir}"/>
+  </path>
+  
+  <path id="distributeproject.module.classpath">
+    <path refid="${module.jdk.classpath.distributeproject}"/>
+    <pathelement location="${distributeproject.output.dir}"/>
+    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/junit-4.12.jar"/>
+  </path>
+  
+  <path id="distributeproject.runtime.module.classpath">
+    <pathelement location="${distributeproject.testoutput.dir}"/>
+    <pathelement location="${distributeproject.output.dir}"/>
+    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/junit-4.12.jar"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.distributeproject">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.distributeproject">
+    <patternset refid="excluded.from.module.distributeproject"/>
+  </patternset>
+  
+  <path id="distributeproject.module.sourcepath">
+    <dirset dir="${module.distributeproject.basedir}">
+      <include name="src"/>
+      <include name="test"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.distributeproject" depends="compile.module.distributeproject.production,compile.module.distributeproject.tests" description="Compile module DistributeProject"/>
+  
+  <target name="compile.module.distributeproject.production" depends="register.custom.compilers" description="Compile module DistributeProject; production classes">
+    <mkdir dir="${distributeproject.output.dir}"/>
+    <javac2 destdir="${distributeproject.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.distributeproject}/javac">
+      <compilerarg line="${compiler.args.distributeproject}"/>
+      <bootclasspath refid="distributeproject.module.bootclasspath"/>
+      <classpath refid="distributeproject.module.production.classpath"/>
+      <src refid="distributeproject.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.distributeproject"/>
+    </javac2>
+    
+    <copy todir="${distributeproject.output.dir}">
+      <fileset dir="${module.distributeproject.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.distributeproject.basedir}/test">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.distributeproject.tests" depends="register.custom.compilers,compile.module.distributeproject.production" description="compile module DistributeProject; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.distributeproject" description="cleanup module">
+    <delete dir="${distributeproject.output.dir}"/>
+    <delete dir="${distributeproject.testoutput.dir}"/>
+  </target>
+</project>
