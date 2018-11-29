@@ -51,20 +51,32 @@ public class DCRSImpl {
         if (department.equals("comp")){
             addCourse("comp1","fall");
             addCourse("comp2","fall");
+            courseMap.put("inse1", "fall");
+            courseMap.put("inse2", "fall");
+            courseMap.put("soen1", "fall");
+            courseMap.put("soen2", "fall");
         }
         if (department.equals("soen")){
             addCourse("soen1","fall");
             addCourse("soen2","fall");
+            courseMap.put("inse1", "fall");
+            courseMap.put("inse2", "fall");
+            courseMap.put("comp1", "fall");
+            courseMap.put("comp2", "fall");
         }
         if (department.equals("inse")){
             addCourse("inse1","fall");
             addCourse("inse2","fall");
+            courseMap.put("comp1", "fall");
+            courseMap.put("comp2", "fall");
+            courseMap.put("soen1", "fall");
+            courseMap.put("soen2", "fall");
         }
     }
 
     public String addCourse(String courseId, String semester){
         if (serverMap.get(semester) == null ) return "The Semester Does Not Exist! Please Check The Semester";
-        String result = "Add successful";
+        String result = "Add Successful";
         if (!departmentCheck(courseId)) {
             logger.info("Add Course:" + courseId + " " + semester + ":" + "Not Authorized");
             result = "You Are Not Authorized To Add The Course ";
@@ -110,13 +122,12 @@ public class DCRSImpl {
                 serverMap.put(semester, semesterMap);
                 courseMap.remove(courseId, semester);
                 for (String studentId : studentList) {
-                    Student student = studentMap.get(studentId);
-                    removeStudentCourse(student, semester, courseId);
-                    if (!course.getDepartment().equals(student.getMajor())) {
-                        student.decreaseOtherCount();
-                        student.decreaseCount(semester);
+                    if (studentId.substring(0,4).equals(department)){
+                        removeLocalCourse(studentId, semester, courseId);
                     } else {
-                        student.decreaseCount(semester);
+                        int recvPort = getUDPPort(studentId.substring(0,4));
+                        String message = "removeCourse " + studentId + " " + semester + " " + courseId;
+                        UdpClient.request(message, recvPort);
                     }
                 }
                 course.resetCourse();
@@ -124,6 +135,24 @@ public class DCRSImpl {
         }
         logger.info("Remove Course:" + courseId + " " + semester + ":" + " Remove Successful");
         return result;
+    }
+
+    public String removeLocalCourse(String studentId, String semester, String courseId){
+        Student student = studentMap.get(studentId);
+        HashMap<String, ArrayList<String>> enrolledMap = student.getEnrolledCourse();
+        ArrayList<String> enrolledList = enrolledMap.get(semester);
+
+        enrolledList.remove(courseId);
+        student.setEnrolledCourse(semester, enrolledList);
+        if (!courseId.substring(0,4).equals(student.getMajor())) {
+            student.decreaseOtherCount();
+            student.decreaseCount(semester);
+        } else {
+            student.decreaseCount(semester);
+        }
+
+        return "true,Remove Successful";
+
     }
 
     public String[] listCourseAvailability(String semester) {
@@ -168,7 +197,7 @@ public class DCRSImpl {
     }
 
     public String enrolCourse(String studentId, String courseId, String semester) {
-        String result = courseId + " Enroll Successfully";
+        String result;
         courseId = courseId.toLowerCase();
         studentId = studentId.toLowerCase();
         String courseDepartment = getDepartment(courseId);
@@ -182,13 +211,15 @@ public class DCRSImpl {
         }
 
         if (student.getCourseCount(semester) >= 3) {
-            result = "Do not allow to enroll";
+            System.out.println("enrol 1st");
+            result = courseId + " Do not allow to enroll";
             return result;
         }
 
         if (courseDepartment.equals(getDepartment(studentId))) {
             result = enrolLocalCourse(studentId, courseId, semester);
             if (result.split(",")[0].equals("false")) {
+                System.out.println("enrol 2nd");
                 return result.split(",")[1];
             } else {
                 int count = student.getCourseCount(semester) + 1;
@@ -198,20 +229,23 @@ public class DCRSImpl {
                 courses.add(courseId);
                 student.setEnrolledCourse(semester, courses);
                 studentMap.put(studentId, student);
+                System.out.println("enrol 3rd");
                 result = result.split(",")[1];
             }
         } else {
             if (student.getOtherCount() >= 2) {
+                System.out.println("enrol 4th");
                 result = courseId + " Do not allow to enroll";
                 return result;
             }
 
             int receiverPort = getUDPPort(courseDepartment);
-            String message = "enrolCourse," + studentId + "," + courseId + "," + semester;
+            String message = "enrolCourse " + studentId + " " + courseId + " " + semester;
             String reply = UdpClient.request(message, receiverPort);
             String spReply[] = reply.split(",");
             if (spReply[0].equals("false")) {
-                result = spReply[1];
+                result = spReply[1].trim();
+                System.out.println("enrol 5th");
                 return result;
             } else {
                 int count = student.getCourseCount(semester) + 1;
@@ -222,10 +256,12 @@ public class DCRSImpl {
                 courses.add(courseId);
                 student.setEnrolledCourse(semester, courses);
                 studentMap.put(studentId, student);
-                result = result.split(",")[1];
+                System.out.println("enrol 6th");
+                result = spReply[1].trim();
             }
         }
         logger.info("Enroll Course :" + studentId + " " + courseId + " " + semester + ":" + result);
+        System.out.println("enrol 7th");
         return result;
     }
 
@@ -244,9 +280,15 @@ public class DCRSImpl {
         }
 
         String semester = courseMap.get(courseId);
+        System.out.println("indrop courseId ==> " + courseId);
+        for (String s : courseMap.keySet()) {
+            System.out.println("indrop courseMap key ==> " + s);
+        }
+        System.out.println("indrop ==> " + semester);
         if (courseDepartment.equals(getDepartment(studentId))) {
             result = dropLocalCourse(studentId, courseId, semester);
             if (result.split(",")[0].equals("false")) {
+                System.out.println("drop 1");
                 return result.split(",")[1];
             } else {
                 int count = student.getCourseCount(semester) - 1;
@@ -256,15 +298,17 @@ public class DCRSImpl {
                 courses.remove(courseId);
                 student.setEnrolledCourse(semester, courses);
                 studentMap.put(studentId, student);
+                System.out.println("drop 2");
                 result = result.split(",")[1];
             }
         } else {
             int receiverPort = getUDPPort(courseDepartment);
-            String message = "dropCourse," + studentId + "," + courseId + "," + semester;
+            String message = "dropCourse " + studentId + " " + courseId + " " + semester;
             String reply = UdpClient.request(message, receiverPort);
             String spReply[] = reply.split(",");
             if (spReply[0].equals("false")) {
                 result = spReply[1];
+                System.out.println("drop 3");
                 return result;
             } else {
                 int count = student.getCourseCount(semester) - 1;
@@ -275,10 +319,12 @@ public class DCRSImpl {
                 courses.remove(courseId);
                 student.setEnrolledCourse(semester, courses);
                 studentMap.put(studentId, student);
-                result = result.split(",")[1];
+                System.out.println("drop 4");
+                result = spReply[1];
             }
         }
         logger.info("Drop Course :" + studentId + " " + courseId + ":" + result);
+        System.out.println("drop 5");
         return result;
     }
 
@@ -287,6 +333,7 @@ public class DCRSImpl {
 
         ConcurrentHashMap<String, Course> semesterMap = serverMap.get(semester);
         if (!semesterMap.containsKey(courseId)) {
+            System.out.println("enrol 8th");
             result = "false,The Course does not Exist!";
             return result;
         }
@@ -295,11 +342,13 @@ public class DCRSImpl {
         ArrayList<String> studentList = course.getStudentList();
 
         if (course.getCapacity() <= 0) {
+            System.out.println("enrol 9th");
             result = "false," + courseId + " Do not allow to enroll";
             return result;
         }
 
         if (studentList.contains(studentId)) {
+            System.out.println("enrol 10th");
             result = "false," + courseId + " Do not allow to enroll";
             return result;
         }
@@ -317,10 +366,19 @@ public class DCRSImpl {
     public String dropLocalCourse (String studentId, String courseId, String semester) {
         String result = "true,Drop Successful!";
 
+        System.out.println("courseId ==> " + courseId);
+        System.out.println("semester ==> " + semester);
+
         ConcurrentHashMap<String, Course> semesterMap = serverMap.get(semester);
+        System.out.println("semesterMap size ==> " + semesterMap.size());
+
+        for (String s : semesterMap.keySet()) {
+            System.out.println("semesterMap key ==> " + s);
+        }
 
         if (!semesterMap.containsKey(courseId)) {
             result = "false,Drop Fail";
+            System.out.println("drop 6");
             return result;
         }
 
@@ -329,6 +387,7 @@ public class DCRSImpl {
 
         if (!studentList.contains(studentId)){
             result = "false,Course Not Found In The Student Course List";
+            System.out.println("drop 7");
             return result;
         }
 
@@ -339,11 +398,12 @@ public class DCRSImpl {
             semesterMap.put(courseId, course);
             serverMap.put(semester, semesterMap);
         }
+        System.out.println("drop 8");
         return result;
     }
 
     public String swapCourse (String studentId, String newCourseId, String oldCourseId) {
-        String result = "Swap Course Successful";
+        String result = "Swap Course Successful!";
         newCourseId = newCourseId.toLowerCase();
         oldCourseId = oldCourseId.toLowerCase();
         studentId = studentId.toLowerCase();
@@ -357,11 +417,14 @@ public class DCRSImpl {
         }
 
         String oldSemester = getSemester(oldCourseId);
+        System.out.println("old ==> " + oldSemester);
         String newSemester = getSemester(newCourseId);
+        System.out.println("new ==> " + newSemester);
 
         if (!oldSemester.equals(newSemester)) {
             logger.info("Swap Course:" + oldCourseId + "->" + newCourseId + ":" + " Swap Fail");
-            result = "Swap Fail";
+            result = "Swap Fail!";
+            System.out.println("swap 1");
             return result;
         }
 
@@ -379,14 +442,16 @@ public class DCRSImpl {
 //            System.out.println(courseName.equals(oldCourseId));
             if (!courseName.equals(oldCourseId)) {
                 logger.info("Swap Course:" + oldCourseId + "->" + newCourseId + ":" + " Swap Fail");
-                result= "Swap Fail";
+                result= "Swap Fail!";
+                System.out.println("swap 2");
                 return result;
             }
         }
 
         if (checkAvailability(newCourseId).trim().equals("false")) {
             logger.info("Swap Course:" + oldCourseId + "->" + newCourseId + ":" + " Swap Fail");
-            result = "Swap Fail";
+            result = "Swap Fail!";
+            System.out.println("swap 3");
             return result;
         }
 
@@ -395,6 +460,7 @@ public class DCRSImpl {
         enrolCourse(studentId, newCourseId, newSemester);
 
         logger.info("Swap Course:" + oldCourseId + "->" + newCourseId + ":" + " Swap Successful");
+        System.out.println("swap 4");
         return result;
     }
 
@@ -461,13 +527,6 @@ public class DCRSImpl {
         return result;
     }
 
-    private void removeStudentCourse(Student student, String semester, String courseId){
-        HashMap<String, ArrayList<String>> enrolledMap = student.getEnrolledCourse();
-        ArrayList<String> enrolledList = enrolledMap.get(semester);
-        enrolledList.remove(courseId);
-        student.setEnrolledCourse(semester, enrolledList);
-    }
-
     private Boolean departmentCheck(String courseId) {
         String courseDepart = getDepartment(courseId);
         if (!courseDepart.equals(this.department)) {
@@ -491,6 +550,12 @@ public class DCRSImpl {
             String reply2 = UdpClient.request(message , Config.UDP_SOEN_PORT);
             reply = reply1 + reply2;
         }
+
+        System.out.println("combine reply ==> " + reply);
+        if (reply.contains("none")) {
+            reply = reply.replace("none", "");
+        }
+        System.out.println("combine reply after clean ==> " + reply);
 
         return reply;
     }
@@ -518,7 +583,7 @@ public class DCRSImpl {
         } else {
             String courseDepartment = getDepartment(courseId);
             int receiverPort = getUDPPort(courseDepartment);
-            String message = "getSemester," + courseId;
+            String message = "getSemester " + courseId;
             String reply = UdpClient.request(message, receiverPort).trim();
             return reply;
         }

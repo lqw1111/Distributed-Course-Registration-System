@@ -1,0 +1,11 @@
+[Thu Nov 29 02:12:50 EST 2018] [INFO] Add Course                              |inse1 fall                              |Add Successful                          |
+[Thu Nov 29 02:12:50 EST 2018] [INFO] Add Course                              |inse2 fall                              |Add Successful                          |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Add Course                              |inse6320 winter                         |Add Successful                          |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Enroll Course                           |soens4444 inse6320 winter               |inse6320 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Enroll Course                           |soens1111 inse6320 winter               |inse6320 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Enroll Course                           |inses1111 inse6320 winter               |inse6320 Do not allow to enroll         |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Send Request                     |dropRemovedCourseFromStuCourList inse6320|
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Recv Response                    |Remove Successful                       |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Send Request                     |dropRemovedCourseFromStuCourList inse6320|
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Recv Response                    |Remove Successful                       |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Remove Course                           |inse6320 winter                         | Remove Successful                      |

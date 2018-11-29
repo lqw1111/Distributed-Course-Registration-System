@@ -40,12 +40,16 @@ public class UdpServer implements Runnable {
                 String operation = opArgs[0];
                 switch (operation){
                     case ("listCourseAvailability"):
-                        String[] availability = dcrsImpl.localCourseAvailability(opArgs[1]);
                         String result = "";
-                        for (String a : availability) {
-                            result = result + a;
+                        String[] availability = dcrsImpl.localCourseAvailability(opArgs[1]);
+                        if (availability.length == 0) {
+                            replyBuffer = ("none\n").getBytes();
+                        } else {
+                            for (String a : availability) {
+                                result = result + a;
+                            }
+                            replyBuffer = (result + "\n").getBytes();
                         }
-                        replyBuffer = (result + "\n").getBytes();
                         break;
                     case("enrolCourse"):
                         String enrolResult = dcrsImpl.enrolLocalCourse(opArgs[1], opArgs[2], opArgs[3]);
@@ -62,6 +66,10 @@ public class UdpServer implements Runnable {
                     case("checkAvailability"):
                         String swapAvailability = dcrsImpl.checkLocalAvailbility(opArgs[1]);
                         replyBuffer = (swapAvailability + "\n").getBytes();
+                        break;
+                    case("removeCourse"):
+                        String removeResult = dcrsImpl.removeLocalCourse(opArgs[1], opArgs[2], opArgs[3]);
+                        replyBuffer = (removeResult + "\n").getBytes();
                         break;
                     default:
                         replyBuffer = "1".getBytes();

@@ -1,19 +1,16 @@
-
-import org.junit.Test;
-
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 
-public class TestReplica {
-
-
+public class TestReplicaCompara {
     public static void sendRequest(String deparment, String msg) throws IOException {
         InetAddress address = InetAddress.getByName("localhost");
         String ms = deparment + ":" + msg;
         byte[] data = ms.getBytes();
-        DatagramPacket sendPacket = new DatagramPacket(data, data.length, address, 2222);
+        DatagramPacket sendPacket = new DatagramPacket(data, data.length, address, 1111);
 
-        DatagramSocket socket = new DatagramSocket(2002);
+        DatagramSocket socket = new DatagramSocket(2001);
 
         socket.send(sendPacket);
 

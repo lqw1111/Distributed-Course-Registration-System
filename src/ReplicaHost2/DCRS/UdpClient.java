@@ -19,9 +19,10 @@ public class UdpClient{
             byte[] buffer = new byte[1024];
             DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
             socket.receive(reply);
-//            System.out.println("client reply ==> " + reply.getData());
+            System.out.println("reply byte ==> " + reply.getLength());
+            System.out.println("client reply ==> " + new String(reply.getData()));
             result = new String(reply.getData(),0, reply.getLength()).split("\n")[0] + "\n";
-//            System.out.println("client result ==> " + result);
+            System.out.println("client result ==> " + result);
 
             socket.close();
 

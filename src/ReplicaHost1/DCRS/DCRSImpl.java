@@ -149,7 +149,7 @@ public class DCRSImpl {
             }
 
             String[] courses = courseAvailibleList.split(" ");
-            Arrays.sort(courses);
+
             for (String course :
                     courses) {
                 if (!course.equals("")){
@@ -157,11 +157,14 @@ public class DCRSImpl {
                 }
             }
 
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return translateStringArray(courseList);
+        String[] result = translateStringArray(courseList);
+        Arrays.sort(result);
+        return result;
     }
 
     private String[] translateStringArray(List<String> courseList) {
@@ -291,8 +294,9 @@ public class DCRSImpl {
             String str = course.getCourseName() + "--" + course.getSemester();
             res.add(str);
         }
-
-        return translateStringArray(res);
+        String[] result = translateStringArray(res);
+        Arrays.sort(result);
+        return result;
     }
 
     public String swapCourse(String studentID, String newCourseID, String oldCourseID) {

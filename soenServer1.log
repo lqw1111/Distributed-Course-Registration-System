@@ -1,0 +1,33 @@
+[Thu Nov 29 02:12:50 EST 2018] [INFO] Add Course                              |soen1 fall                              |Add Successful                          |
+[Thu Nov 29 02:12:50 EST 2018] [INFO] Add Course                              |soen2 fall                              |Add Successful                          |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Add Course                              |soen6441 winter                         |Add Successful                          |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Send Request                     |enrolCourse soens4444 inse6320 winter   |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Recv Response                    |inse6320 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Enroll Course                           |soens4444 inse6320 winter               |inse6320 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Send Request                     |enrolCourse soens4444 comp6231 winter   |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Recv Response                    |comp6231 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Enroll Course                           |soens4444 comp6231 winter               |comp6231 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Send Request                     |enrolCourse soens5555 comp6281 winter   |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Recv Response                    |comp6281 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Enroll Course                           |soens5555 comp6281 winter               |comp6281 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Enroll Course                           |soens5555 soen6441 winter               |soen6441 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] List Course Availability                |winter                                  |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Send Request                     |listCourseAvailability winter           |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Recv Response                    |comp6231--1 comp6281--1                 |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Send Request                     |listCourseAvailability winter           |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Recv Response                    |inse6320--1                             |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Send Request                     |enrolCourse soens1111 inse6320 winter   |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Recv Response                    |inse6320 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Enroll Course                           |soens1111 inse6320 winter               |inse6320 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Send Request                     |enrolCourse soens1111 comp6231 winter   |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Recv Response                    |comp6231 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Enroll Course                           |soens1111 comp6231 winter               |comp6231 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Enroll Course                           |soens1111 comp6281 winter               |Do not allow to enroll                  |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Enroll Course                           |soens1111 soen6441 winter               |soen6441 Enroll Successfully            |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Get Class Schedule                      |soens1111                               |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] List Course Availability                |winter                                  |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Send Request                     |listCourseAvailability winter           |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Recv Response                    |comp6231--0 comp6281--1                 |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Send Request                     |listCourseAvailability winter           |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Client Recv Response                    |
+[Thu Nov 29 02:12:55 EST 2018] [INFO] Get Class Schedule                      |soens1111                               |
