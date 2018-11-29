@@ -16,7 +16,7 @@ public class Timer implements Runnable{
     @Override
     public void run() {
         try {
-            Thread.sleep(2000);
+            Thread.sleep(5000);
             timeout = true;
             socket.close();
         } catch (InterruptedException e) {

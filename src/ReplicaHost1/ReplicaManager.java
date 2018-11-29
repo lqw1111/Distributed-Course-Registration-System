@@ -2,9 +2,7 @@ package ReplicaHost1;
 
 import PortInfo.FEPort;
 import PortInfo.Replica;
-import PortInfo.SequencerPort;
 import ReplicaHost1.Log.LoggerFormatter;
-import javax.swing.plaf.TableHeaderUI;
 import java.io.IOException;
 import java.net.*;
 import java.util.Comparator;
@@ -46,7 +44,7 @@ public class ReplicaManager {
         DatagramSocket socket = new DatagramSocket(RMPort);
         DatagramPacket packet = null;
         byte[] data = null;
-
+        logger.info("Replica Start");
         while(true)
         {
             data = new byte[1024];
@@ -56,19 +54,19 @@ public class ReplicaManager {
             String receiveMessage = new String(packet.getData(), 0, packet.getLength());
 
 
-            if (receiveMessage.equals(Failure.SoftWareFailure)){
+            if (receiveMessage.indexOf(Failure.SoftWareFailure.toString()) != -1){
 
                 //TODO:log software failure
                 logger.info("RM_" + ReplicaId + " SoftWareFailure");
+                TellSoftWareFail(ReplicaPort.REPLICA_PORT.softwareFail);
 
             } else if (receiveMessage.indexOf(Failure.ServerCrash.toString()) != -1){
 
                 //TODO:log server crash
                 //check whether crash
-
                 String crashServerNum = receiveMessage.split(" ")[0];
 
-                if (crashServerNum != this.ReplicaId){
+                if (!crashServerNum.equals(this.ReplicaId)){
                     Thread checkThread = new Thread(new CheckAlive(crashServerNum));
                     checkThread.start();
                 }
@@ -78,6 +76,14 @@ public class ReplicaManager {
                 moveToHoldBackQueue(recvMsg);
             }
         }
+    }
+
+    private void TellSoftWareFail(int softwarePort) throws IOException {
+        InetAddress address = InetAddress.getByName("localhost");
+        byte[] data = "SoftwareFailure".getBytes();
+        DatagramPacket packet = new DatagramPacket(data, 0 , data.length , address , softwarePort);
+        DatagramSocket socket = new DatagramSocket();
+        socket.send(packet);
     }
 
     private void moveToHoldBackQueue(Message recvMsg) throws IOException {
@@ -123,7 +129,7 @@ public class ReplicaManager {
         byte[] data = ms.getBytes();
         DatagramPacket sendPacket = new DatagramPacket(data, data.length, address, ReplicaPort.REPLICA_PORT.port);
 
-        DatagramSocket socket = new DatagramSocket(2001);
+        DatagramSocket socket = new DatagramSocket(RMPortInfo.RM_PORT_INFO.execMsgToRplc);
 
         socket.send(sendPacket);
 
@@ -135,13 +141,11 @@ public class ReplicaManager {
         thread.start();
         try{
             socket.receive(recvPacket);
+            String receiveMessage = new String(recvPacket.getData(), 0, recvPacket.getLength());
+            packageMsgAndSendToFE(socket, msg.getFEHostAddress(), receiveMessage);
         } catch (SocketException e) {
             logger.info("TIME OUT:Replica_" + ReplicaId + " Not Reply");
         }
-
-        String receiveMessage = new String(recvPacket.getData(), 0, recvPacket.getLength());
-
-        packageMsgAndSendToFE(socket, msg.getFEHostAddress(), receiveMessage);
     }
 
     private void packageMsgAndSendToFE (DatagramSocket socket, String feHostAddress, String receiveMessage) throws IOException {
@@ -164,19 +168,24 @@ public class ReplicaManager {
     }
 
     private void listenCrash(int port){
+        logger.info("Crash Listener Start");
         try {
             DatagramSocket socket = new DatagramSocket(port);
-            byte[] data = new byte[1024];
-            DatagramPacket packet = new DatagramPacket(data, data.length);
 
-            int count = 0;
-            while (count < 3){
-                socket.receive(packet);
-                count ++;
+            while (true){
+                byte[] data = new byte[1024];
+                DatagramPacket packet = new DatagramPacket(data, data.length);
+
+                int count = 0;
+                while (count < 3){
+                    socket.receive(packet);
+                    logger.info("Recv Crash Message" + count);
+                    count ++;
+                }
+                this.logger.info("Replica_" + ReplicaId + " Crash");
+
+                restartReplica();
             }
-
-            this.logger.info("Replica_" + ReplicaId + " Crash");
-
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -184,7 +193,21 @@ public class ReplicaManager {
         }
     }
 
+    private void restartReplica() throws IOException {
+        Runnable replica1 = () -> {
+            try {
+                Replica1.main(null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+
+        Thread thread = new Thread(replica1);
+        thread.start();
+    }
+
     private void listenBackUp(int backUpPort){
+        logger.info("BackUp Listener Start");
         try {
             DatagramSocket socket = new DatagramSocket(backUpPort);
             byte[] data = new byte[1024];
@@ -203,7 +226,7 @@ public class ReplicaManager {
                 };
                 Queue<Message> q = new PriorityQueue<>(comparator);
 
-                if (msg.equals(Failure.BackUp)){
+                if (msg.equals("BackUp")){
                     while (!backUpQueue.isEmpty()){
 
                         Message message = backUpQueue.poll();
@@ -212,7 +235,7 @@ public class ReplicaManager {
                         String ms = message.getDepartment() + ":" + message.getMessage();
 
                         byte[] senddata = ms.getBytes();
-                        DatagramPacket sendPacket = new DatagramPacket(senddata, senddata.length, packet.getAddress(), packet.getPort());
+                        DatagramPacket sendPacket = new DatagramPacket(senddata, senddata.length, packet.getAddress(), ReplicaPort.REPLICA_PORT.backUpPort);
 
                         socket.send(sendPacket);
 
@@ -221,6 +244,7 @@ public class ReplicaManager {
 
                         socket.receive(packet1);
 
+                        System.out.println(new String(packet1.getData(),0,data.length));
                     }
                 }
 
@@ -257,11 +281,11 @@ public class ReplicaManager {
         };
 
         Runnable CrashListener = () -> {
-            RM.listenCrash(7001);
+            RM.listenCrash(RMPortInfo.RM_PORT_INFO.recvCrash);
         };
 
         Runnable BackUpListener = () -> {
-            RM.listenBackUp(5001);
+            RM.listenBackUp(RMPortInfo.RM_PORT_INFO.backUp);
         };
 
         Thread t1 = new Thread(RMListenerTask);
@@ -275,8 +299,17 @@ public class ReplicaManager {
 
 }
 
-enum ReplicaPort{
+enum ReplicaPort {
     REPLICA_PORT;
     final int port = 1111;
     final int backUpPort = 8081;
+    final int softwareFail = 8881;
+}
+
+enum RMPortInfo{
+    RM_PORT_INFO;
+    final int recvMsg = 6001;
+    final int execMsgToRplc = 2001;
+    final int backUp = 5001;
+    final int recvCrash = 7001;
 }

@@ -136,13 +136,13 @@ public class DCRSImpl {
             String courseAvailibleList = "";
             String message = "listCourseAvailability " + semester;
             if (this.department.equals("comp")){
-                courseAvailibleList = getRemoteCourseList(message,2223, message,3334);
+                courseAvailibleList = getRemoteCourseList(message,departmentPort.DEPARTMENT_PORT.SOEN, message,departmentPort.DEPARTMENT_PORT.INSE);
 
             } else if(this.department.equals("inse")){
-                courseAvailibleList = getRemoteCourseList(message,2223, message,1112);
+                courseAvailibleList = getRemoteCourseList(message,departmentPort.DEPARTMENT_PORT.SOEN, message,departmentPort.DEPARTMENT_PORT.COMP);
 
             } else if(this.department.equals("soen")){
-                courseAvailibleList = getRemoteCourseList(message,1112, message,3334);
+                courseAvailibleList = getRemoteCourseList(message,departmentPort.DEPARTMENT_PORT.COMP, message,departmentPort.DEPARTMENT_PORT.INSE);
             }
 
             String[] courses = courseAvailibleList.split(" ");
@@ -651,11 +651,11 @@ public class DCRSImpl {
     private int getPort(String department){
         int port;
         if (department.equals("comp")){
-            port = 1112;
+            port = departmentPort.DEPARTMENT_PORT.COMP;
         } else if(department.equals("soen")){
-            port = 2223;
+            port = departmentPort.DEPARTMENT_PORT.SOEN;
         } else {
-            port = 3334;
+            port = departmentPort.DEPARTMENT_PORT.INSE;
         }
         return port;
     }
@@ -681,4 +681,11 @@ public class DCRSImpl {
         return info;
     }
 
+}
+
+enum departmentPort{
+    DEPARTMENT_PORT;
+    final int COMP = 5556;
+    final int SOEN = 5557;
+    final int INSE = 5558;
 }
