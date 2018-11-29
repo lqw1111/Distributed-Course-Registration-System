@@ -1,0 +1,6 @@
+#log file
+*.log
+*.log.1
+out
+.idea
+*.iml
