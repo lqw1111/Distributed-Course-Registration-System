@@ -1,59 +1,52 @@
 package ReplicaHost2.DCRS;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-
 public class DCRSImpl {
-
-    public Logger logger;
-    public String department;
-    public ConcurrentHashMap<String, ConcurrentHashMap<String, Course>> compCourseDatabase = new ConcurrentHashMap<String, ConcurrentHashMap<String, Course>>();
-
-    //studentId -> student
-    public Map<String, Student> studentEnrollDatabase = new ConcurrentHashMap<String,Student>();
-
+    private String department;
+    private Logger logger;
+    private ConcurrentHashMap<String, ConcurrentHashMap<String, Course>> serverMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Student> studentMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, String> courseMap = new ConcurrentHashMap<>(); // <CourseId, Semester>
 
     public DCRSImpl(String department, Logger logger){
         this.department = department;
         this.logger = logger;
 
-        ConcurrentHashMap<String, Course> fallCourse = new ConcurrentHashMap<String, Course>();
-        compCourseDatabase.put("fall", fallCourse);
+        ConcurrentHashMap<String, ReplicaHost2.DCRS.Course> fallCourse = new ConcurrentHashMap<>();
+        serverMap.put("fall", fallCourse);
 
-        ConcurrentHashMap<String, Course> winterCourse = new ConcurrentHashMap<String, Course>();
-        compCourseDatabase.put("winter", winterCourse);
+        ConcurrentHashMap<String, ReplicaHost2.DCRS.Course> winterCourse = new ConcurrentHashMap<>();
+        serverMap.put("winter", winterCourse);
 
-        ConcurrentHashMap<String, Course> summerCourse = new ConcurrentHashMap<String, Course>();
-        compCourseDatabase.put("summer", summerCourse);
+        ConcurrentHashMap<String, ReplicaHost2.DCRS.Course> summerCourse = new ConcurrentHashMap<>();
+        serverMap.put("summer", summerCourse);
 
-        Student student1 = new Student(department + "s1111",new ArrayList<Course>());
-        Student student2 = new Student(department + "s2222",new ArrayList<Course>());
-        Student student3 = new Student(department + "s3333",new ArrayList<Course>());
-        Student student4 = new Student(department + "s4444",new ArrayList<Course>());
-        Student student5 = new Student(department + "s5555",new ArrayList<Course>());
-        Student student6 = new Student(department + "s6666",new ArrayList<Course>());
-        Student student7 = new Student(department + "s7777",new ArrayList<Course>());
-        Student student8 = new Student(department + "s8888",new ArrayList<Course>());
-        Student student9 = new Student(department + "s9999",new ArrayList<Course>());
-        Student student10 = new Student(department + "s1010",new ArrayList<Course>());
+        ReplicaHost2.DCRS.Student student1 = new ReplicaHost2.DCRS.Student(department + "s1111");
+        ReplicaHost2.DCRS.Student student2 = new ReplicaHost2.DCRS.Student(department + "s2222");
+        ReplicaHost2.DCRS.Student student3 = new ReplicaHost2.DCRS.Student(department + "s3333");
+        ReplicaHost2.DCRS.Student student4 = new ReplicaHost2.DCRS.Student(department + "s4444");
+        ReplicaHost2.DCRS.Student student5 = new ReplicaHost2.DCRS.Student(department + "s5555");
+        ReplicaHost2.DCRS.Student student6 = new ReplicaHost2.DCRS.Student(department + "s6666");
+        ReplicaHost2.DCRS.Student student7 = new ReplicaHost2.DCRS.Student(department + "s7777");
+        ReplicaHost2.DCRS.Student student8 = new ReplicaHost2.DCRS.Student(department + "s8888");
+        ReplicaHost2.DCRS.Student student9 = new ReplicaHost2.DCRS.Student(department + "s9999");
+        ReplicaHost2.DCRS.Student student10 = new ReplicaHost2.DCRS.Student(department + "s1010");
 
-
-        studentEnrollDatabase.put(department + "s2222",student2);
-        studentEnrollDatabase.put(department + "s3333",student3);
-        studentEnrollDatabase.put(department + "s4444",student4);
-        studentEnrollDatabase.put(department + "s5555",student5);
-        studentEnrollDatabase.put(department + "s6666",student6);
-        studentEnrollDatabase.put(department + "s7777",student7);
-        studentEnrollDatabase.put(department + "s8888",student8);
-        studentEnrollDatabase.put(department + "s9999",student9);
-        studentEnrollDatabase.put(department + "s1010",student10);
+        studentMap.put(department + "s1111",student1);
+        studentMap.put(department + "s2222",student2);
+        studentMap.put(department + "s3333",student3);
+        studentMap.put(department + "s4444",student4);
+        studentMap.put(department + "s5555",student5);
+        studentMap.put(department + "s6666",student6);
+        studentMap.put(department + "s7777",student7);
+        studentMap.put(department + "s8888",student8);
+        studentMap.put(department + "s9999",student9);
+        studentMap.put(department + "s1010",student10);
 
         if (department.equals("comp")){
             addCourse("comp1","fall");
@@ -69,623 +62,477 @@ public class DCRSImpl {
         }
     }
 
-    public String addCourse(String courseId, String semester) {
-        if (compCourseDatabase.get(semester) == null ) return "The Semester Does Not Exist! Please Check The Semester";
-        if (courseId.substring(0,4).equals(this.department)){
-            String result = "";
-            Course newCourse = new Course(courseId , semester);
-            ConcurrentHashMap<String, Course> courseIdCourseMap = compCourseDatabase.get(semester);
+    public String addCourse(String courseId, String semester){
+        if (serverMap.get(semester) == null ) return "The Semester Does Not Exist! Please Check The Semester";
+        String result = "Add successful";
+        if (!departmentCheck(courseId)) {
+            logger.info("Add Course:" + courseId + " " + semester + ":" + "Not Authorized");
+            result = "You Are Not Authorized To Add The Course ";
+            return result;
+        }
 
-            if (courseIdCourseMap.containsKey(courseId)){
-                result = "The Course Have Already Added!";
-            } else {
-                synchronized (courseIdCourseMap){
-                    courseIdCourseMap.put(courseId, newCourse);
-                    compCourseDatabase.put(semester,courseIdCourseMap);
-                    result = "Add Successful";
-                }
-            }
-            logger.info("Add Course:" + courseId + " " + semester + ":" + result);
-
+        ConcurrentHashMap<String, Course> semesterMap = serverMap.get(semester);
+        if (semesterMap.containsKey(courseId)) {
+            result = "The Course Have Already Added!";
             return result;
         } else {
-            logger.info("Add Course:" + courseId + " " + semester + ":" + "Not Authorized");
-            return "You Are Not Authorized To Add The Course ";
+            synchronized (semesterMap) {
+                Course course = new Course(courseId);
+                course.setSemester(semester);
+                courseMap.put(courseId, semester);
+                semesterMap.put(courseId, course);
+                serverMap.put(semester, semesterMap);
+            }
         }
+        logger.info("Add Course:" + courseId + " " + semester + ":" + result);
+        return result;
     }
 
     public String removeCourse(String courseId, String semester) {
-        if (compCourseDatabase.get(semester) == null ) return "The Semester Does Not Exist! Please Check The Semester";
-
-        if (!courseId.substring(0,4).equals(this.department)){
+        if (serverMap.get(semester) == null ) return "The Semester Does Not Exist! Please Check The Semester";
+        String result = "Remove Successful";
+        if (!departmentCheck(courseId)) {
             logger.info("Remove Course:" + courseId + " " + semester + ":" + " Not Authorized");
-            return "You Are Not Authorized To Delete The Course ";
-        } else{
-            ConcurrentHashMap<String, Course> courseList = compCourseDatabase.get(semester);
+            result = "You Are Not Authorized To Delete The Course ";
+            return result;
+        }
 
-            //delete the course from course list
-            synchronized (courseList){
-                if (courseList.containsKey(courseId)){
-                    courseList.remove(courseId);
-
-                    //drop the course from all the student who enroll the course
-                    String department = courseId.substring(0,4);
-                    dropRemovedCourseFromStuCourList(courseId);
-                    try {
-                        notifyOtherDepartment(courseId);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+        ConcurrentHashMap<String, Course> semesterMap = serverMap.get(semester);
+        if (!semesterMap.containsKey(courseId)) {
+            logger.info("Remove Course:" + courseId + " " + semester + ":" + "The Course Doesn't Exist");
+            result = "The Course Doesn't Exist";
+            return result;
+        } else {
+            synchronized (semesterMap) {
+                ArrayList<String> studentList = semesterMap.get(courseId).getStudentList();
+                Course course = semesterMap.get(courseId);
+                semesterMap.remove(courseId);
+                serverMap.put(semester, semesterMap);
+                courseMap.remove(courseId, semester);
+                for (String studentId : studentList) {
+                    Student student = studentMap.get(studentId);
+                    removeStudentCourse(student, semester, courseId);
+                    if (!course.getDepartment().equals(student.getMajor())) {
+                        student.decreaseOtherCount();
+                        student.decreaseCount(semester);
+                    } else {
+                        student.decreaseCount(semester);
                     }
-
-                    logger.info("Remove Course:" + courseId + " " + semester + ":" + " Remove Successful");
-                    return "Remove Successful";
-                } else{
-                    logger.info("Remove Course:" + courseId + " " + semester + ":" + "The Course Doesn't Exist");
-                    return "The Course Doesn't Exist";
                 }
+                course.resetCourse();
             }
         }
+        logger.info("Remove Course:" + courseId + " " + semester + ":" + " Remove Successful");
+        return result;
     }
 
     public String[] listCourseAvailability(String semester) {
         logger.info("List Course Availability :" + semester);
-
-        List<String> courseList = getLocalCourseList(semester);
-
-        try {
-            String courseAvailibleList = "";
-            String message = "listCourseAvailability " + semester;
-            if (this.department.equals("comp")){
-                courseAvailibleList = getRemoteCourseList(message,departmentPort.DEPARTMENT_PORT.SOEN, message,departmentPort.DEPARTMENT_PORT.INSE);
-
-            } else if(this.department.equals("inse")){
-                courseAvailibleList = getRemoteCourseList(message,departmentPort.DEPARTMENT_PORT.SOEN, message,departmentPort.DEPARTMENT_PORT.COMP);
-
-            } else if(this.department.equals("soen")){
-                courseAvailibleList = getRemoteCourseList(message,departmentPort.DEPARTMENT_PORT.COMP, message,departmentPort.DEPARTMENT_PORT.INSE);
-            }
-
-            String[] courses = courseAvailibleList.split(" ");
-            for (String course :
-                    courses) {
-                if (!course.equals("")){
-                    courseList.add(course);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        String[] localAvailability = localCourseAvailability(semester);
+        String[] standardLA = new String[localAvailability.length];
+        for (int i = 0; i < localAvailability.length; i++) {
+            standardLA[i] = localAvailability[i].trim();
         }
 
-        return translateStringArray(courseList);
-    }
+        String message = "listCourseAvailability " + semester;
+        String reply = groupSend(message);
+        String[] replyArray = reply.split("\\s+");
 
-    private String[] translateStringArray(List<String> courseList) {
-        String[] res = new String[courseList.size()];
-        for(int i = 0 ; i < courseList.size() ; i ++){
-            res[i] = courseList.get(i);
+        ArrayList<String> availableList = new ArrayList<>();
+        for (String sA : standardLA) {
+            availableList.add(sA);
         }
-        return res;
+        for (String rA : replyArray) {
+            availableList.add(rA);
+        }
+
+        String[] result = new String[availableList.size()];
+        for (String aL : availableList) {
+            int index = availableList.indexOf(aL);
+            result[index] = aL;
+        }
+        Arrays.sort(result);
+        return result;
     }
 
+    public String[] localCourseAvailability(String semester) {
+        ConcurrentHashMap<String, Course> semesterMap = serverMap.get(semester);
+        ArrayList<Course> courseList = new ArrayList<>(semesterMap.values());
+        String[] result = new String[courseList.size()];
+        for (Course course : courseList) {
+            int index = courseList.indexOf(course);
+            String course_capacity = course.getCourseName() + "--" + course.getCapacity() + " ";
+            result[index] = course_capacity;
+        }
+        return result;
+    }
 
     public String enrolCourse(String studentId, String courseId, String semester) {
-        String result = "";
-        if (studentEnrollDatabase.get(studentId) == null && this.department.equals(studentId.substring(0,4))) {
-            return "The Student Does Not Exist! Please Contact With Advisor!";
+        String result = courseId + " Enroll Successfully";
+        courseId = courseId.toLowerCase();
+        studentId = studentId.toLowerCase();
+        String courseDepartment = getDepartment(courseId);
+
+        Student student;
+        if (studentMap.keySet().contains(studentId)) {
+            student = studentMap.get(studentId);
+        } else {
+            student = new Student(studentId);
+            studentMap.put(studentId, student);
         }
 
-        String department = courseId.substring(0,4);
-        if (department.equals(this.department)){
-            if (compCourseDatabase.get(semester).containsKey(courseId)){
+        if (student.getCourseCount(semester) >= 3) {
+            result = "Do not allow to enroll";
+            return result;
+        }
 
-                Course course = compCourseDatabase.get(semester).get(courseId);
-                synchronized (course){
-                    if(allowToEnroll(studentId, courseId, semester) &&
-                            course.getEnrollNumber() < course.getCapacity()){
-                        Student student = studentEnrollDatabase.get(studentId);
-
-                        //if the student belongs to depart,it is a local operate,otherwise it is a remote operate
-                        course.getStudentList().add(studentId);
-                        course.setEnrollNumber(course.getEnrollNumber() + 1);
-                        if (studentId.substring(0, 4).equals(this.department)) {
-                            student.getStudentEnrollCourseList().add(course);
-                        }
-
-                        result = (courseId + " Enroll Successfully");
-                    } else {
-                        result = (courseId + " Do not allow to enroll");
-                    }
-                }
-
+        if (courseDepartment.equals(getDepartment(studentId))) {
+            result = enrolLocalCourse(studentId, courseId, semester);
+            if (result.split(",")[0].equals("false")) {
+                return result.split(",")[1];
             } else {
-                result = "The Course does not Exist!";
+                int count = student.getCourseCount(semester) + 1;
+                student.setCourseCount(semester, count);
+                HashMap<String, ArrayList<String>> enrolledCourse = student.getEnrolledCourse();
+                ArrayList<String> courses = enrolledCourse.get(semester);
+                courses.add(courseId);
+                student.setEnrolledCourse(semester, courses);
+                studentMap.put(studentId, student);
+                result = result.split(",")[1];
             }
-
-
         } else {
-            if(enrollInOtherDepartment(studentId, semester, department)){
-                int port = getPort(department);
-
-                try {
-                    result = sendMessage("enrolCourse " + studentId + " " + courseId + " " + semester, port);
-                    if (result.contains("Successfully")){
-                        Course course = new Course(courseId,semester);
-                        Student student = studentEnrollDatabase.get(studentId);
-                        student.getStudentEnrollCourseList().add(course);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }else{
-                result = "Do not allow to enroll";
+            if (student.getOtherCount() >= 2) {
+                result = courseId + " Do not allow to enroll";
+                return result;
             }
 
+            int receiverPort = getUDPPort(courseDepartment);
+            String message = "enrolCourse," + studentId + "," + courseId + "," + semester;
+            String reply = UdpClient.request(message, receiverPort);
+            String spReply[] = reply.split(",");
+            if (spReply[0].equals("false")) {
+                result = spReply[1];
+                return result;
+            } else {
+                int count = student.getCourseCount(semester) + 1;
+                student.setCourseCount(semester, count);
+                student.increaseOtherCount();
+                HashMap<String, ArrayList<String>> enrolledCourse = student.getEnrolledCourse();
+                ArrayList<String> courses = enrolledCourse.get(semester);
+                courses.add(courseId);
+                student.setEnrolledCourse(semester, courses);
+                studentMap.put(studentId, student);
+                result = result.split(",")[1];
+            }
         }
         logger.info("Enroll Course :" + studentId + " " + courseId + " " + semester + ":" + result);
         return result;
     }
 
     public String dropCourse(String studentId, String courseId) {
+        String result = "Drop Successful!";
+        courseId = courseId.toLowerCase();
+        studentId = studentId.toLowerCase();
+        String courseDepartment = getDepartment(courseId);
 
-        if (studentEnrollDatabase.get(studentId) == null && this.department.equals(studentId.substring(0,4))) {
-            return "The Student Does Not Exist! Please Contact With Advisor!";
+        Student student;
+        if (studentMap.keySet().contains(studentId)) {
+            student = studentMap.get(studentId);
+        } else {
+            student = new Student(studentId);
+            studentMap.put(studentId, student);
         }
 
-        boolean findTargetCourse = false;
-        String result = "";
-        String department = courseId.substring(0,4);
+        String semester = courseMap.get(courseId);
+        if (courseDepartment.equals(getDepartment(studentId))) {
+            result = dropLocalCourse(studentId, courseId, semester);
+            if (result.split(",")[0].equals("false")) {
+                return result.split(",")[1];
+            } else {
+                int count = student.getCourseCount(semester) - 1;
+                student.setCourseCount(semester, count);
+                HashMap<String, ArrayList<String>> enrolledCourse = student.getEnrolledCourse();
+                ArrayList<String> courses = enrolledCourse.get(semester);
+                courses.remove(courseId);
+                student.setEnrolledCourse(semester, courses);
+                studentMap.put(studentId, student);
+                result = result.split(",")[1];
+            }
+        } else {
+            int receiverPort = getUDPPort(courseDepartment);
+            String message = "dropCourse," + studentId + "," + courseId + "," + semester;
+            String reply = UdpClient.request(message, receiverPort);
+            String spReply[] = reply.split(",");
+            if (spReply[0].equals("false")) {
+                result = spReply[1];
+                return result;
+            } else {
+                int count = student.getCourseCount(semester) - 1;
+                student.setCourseCount(semester, count);
+                student.decreaseOtherCount();
+                HashMap<String, ArrayList<String>> enrolledCourse = student.getEnrolledCourse();
+                ArrayList<String> courses = enrolledCourse.get(semester);
+                courses.remove(courseId);
+                student.setEnrolledCourse(semester, courses);
+                studentMap.put(studentId, student);
+                result = result.split(",")[1];
+            }
+        }
+        logger.info("Drop Course :" + studentId + " " + courseId + ":" + result);
+        return result;
+    }
 
-        Student student = studentEnrollDatabase.get(studentId);
-        List<Course> courseList = student.getStudentEnrollCourseList();
-        String semester = "";
-        List<Course> removeCourses = new ArrayList<Course>();
-        for (Course course: courseList){
-            if (course.getCourseName().equals(courseId)){
-                findTargetCourse = true;
-                semester = course.getSemester();
-                removeCourses.add(course);
+    public String enrolLocalCourse (String studentId, String courseId, String semester) {
+        String result = "true," + courseId + " Enroll Successfully";
+
+        ConcurrentHashMap<String, Course> semesterMap = serverMap.get(semester);
+        if (!semesterMap.containsKey(courseId)) {
+            result = "false,The Course does not Exist!";
+            return result;
+        }
+
+        Course course = semesterMap.get(courseId);
+        ArrayList<String> studentList = course.getStudentList();
+
+        if (course.getCapacity() <= 0) {
+            result = "false," + courseId + " Do not allow to enroll";
+            return result;
+        }
+
+        if (studentList.contains(studentId)) {
+            result = "false," + courseId + " Do not allow to enroll";
+            return result;
+        }
+
+        course.decreaseCapacity();
+        studentList.add(studentId);
+        course.setStudentList(studentList);
+        synchronized (semesterMap) {
+            semesterMap.put(courseId, course);
+            serverMap.put(semester, semesterMap);
+        }
+        return result;
+    }
+
+    public String dropLocalCourse (String studentId, String courseId, String semester) {
+        String result = "true,Drop Successful!";
+
+        ConcurrentHashMap<String, Course> semesterMap = serverMap.get(semester);
+
+        if (!semesterMap.containsKey(courseId)) {
+            result = "false,Drop Fail";
+            return result;
+        }
+
+        Course course = semesterMap.get(courseId);
+        ArrayList<String> studentList = course.getStudentList();
+
+        if (!studentList.contains(studentId)){
+            result = "false,Course Not Found In The Student Course List";
+            return result;
+        }
+
+        course.increaseCapacity();
+        studentList.remove(studentId);
+        course.setStudentList(studentList);
+        synchronized (semesterMap) {
+            semesterMap.put(courseId, course);
+            serverMap.put(semester, semesterMap);
+        }
+        return result;
+    }
+
+    public String swapCourse (String studentId, String newCourseId, String oldCourseId) {
+        String result = "Swap Course Successful";
+        newCourseId = newCourseId.toLowerCase();
+        oldCourseId = oldCourseId.toLowerCase();
+        studentId = studentId.toLowerCase();
+
+        Student student;
+        if (studentMap.keySet().contains(studentId)) {
+            student = studentMap.get(studentId);
+        } else {
+            student = new Student(studentId);
+            studentMap.put(studentId, student);
+        }
+
+        String oldSemester = getSemester(oldCourseId);
+        String newSemester = getSemester(newCourseId);
+
+        if (!oldSemester.equals(newSemester)) {
+            logger.info("Swap Course:" + oldCourseId + "->" + newCourseId + ":" + " Swap Fail");
+            result = "Swap Fail";
+            return result;
+        }
+
+        HashMap<String, ArrayList<String>> enrolledCourse = student.getEnrolledCourse();
+//        for (String s : enrolledCourse.keySet()) {
+//            System.out.println("enrolled course ==>" + s + enrolledCourse.get(s).toString());
+//        }
+
+        ArrayList<String> enrolledList = enrolledCourse.get(oldSemester);
+//        System.out.println(enrolledList.toString());
+
+        for (String courseName : enrolledList) {
+//            System.out.println("courseName ==> " + courseName);
+//            System.out.println("oldid ==> " + oldCourseId);
+//            System.out.println(courseName.equals(oldCourseId));
+            if (!courseName.equals(oldCourseId)) {
+                logger.info("Swap Course:" + oldCourseId + "->" + newCourseId + ":" + " Swap Fail");
+                result= "Swap Fail";
+                return result;
             }
         }
 
-        if (findTargetCourse){
-            synchronized (student){
-                courseList.removeAll(removeCourses);
-                if (department.equals(this.department)){
-                    result = dropLocalCourse(studentId, courseId, semester);
-                } else{
-                    String message = "dropCourse " + studentId + " " + courseId + " " + semester;
-                    int port = getPort(department);
-                    try {
-                        result = sendMessage(message, port);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+        if (checkAvailability(newCourseId).trim().equals("false")) {
+            logger.info("Swap Course:" + oldCourseId + "->" + newCourseId + ":" + " Swap Fail");
+            result = "Swap Fail";
+            return result;
+        }
+
+
+        dropCourse(studentId, oldCourseId);
+        enrolCourse(studentId, newCourseId, newSemester);
+
+        logger.info("Swap Course:" + oldCourseId + "->" + newCourseId + ":" + " Swap Successful");
+        return result;
+    }
+
+    public String checkLocalAvailbility(String courseId) {
+        for (ConcurrentHashMap<String, Course> semesterMap : serverMap.values()) {
+            for (String courseName : semesterMap.keySet()) {
+                if (courseName.equals(courseId)) {
+                    Course course = semesterMap.get(courseName);
+                    if (course.getCapacity() == 0) {
+                        return "false";
+                    } else {
+                        return "true";
                     }
                 }
             }
-
-        } else {
-            result = "Course Not Found In The Student Course List";
         }
+        return "false";
+    }
 
-        logger.info("Drop Course :" + studentId + " " + courseId + ":" + result);
-
+    public String getLocalSemester(String courseId) {
+        String result = "null";
+        for (String semester : serverMap.keySet()) {
+            ConcurrentHashMap<String, Course> semesterMap = serverMap.get(semester);
+            for (String courseName : semesterMap.keySet()) {
+                if (courseName.equals(courseId)) {
+                    result = semester;
+                    return result;
+                }
+            }
+        }
         return result;
     }
 
     public String[] getClassSchedule(String studentId) {
-        if (studentEnrollDatabase.get(studentId) == null) return null;
-
         logger.info("Get Class Schedule :" + studentId);
-        List<Course> courses = studentEnrollDatabase.get(studentId).getStudentEnrollCourseList();
-        List<String> res = new ArrayList<>();
-
-        for (Course course :
-                courses) {
-            String str = course.getCourseName() + "--" + course.getSemester();
-            res.add(str);
-        }
-
-        return translateStringArray(res);
-    }
-
-    public String swapCourse(String studentID, String newCourseID, String oldCourseID) {
-        String result = "";
-        Student student = studentEnrollDatabase.get(studentID);
-        String semester = findSemester(student,oldCourseID);
-        if(checkStudentAllowEnrol(studentID,newCourseID,oldCourseID) && checkLocalStuListHaveOldCourseAndNoNewCourse(studentID,oldCourseID,newCourseID)){
-            result = checkEnroll(studentID, newCourseID, oldCourseID, semester);
-            if (result.contains("Successful")){
-                Course newCourse = new Course(newCourseID, findSemester(student, oldCourseID));
-                List<Course> oldCourse = new ArrayList<>();
-                List<Course> courses = studentEnrollDatabase.get(studentID).getStudentEnrollCourseList();
-                for (Course course : courses) {
-                    if (course.getCourseName().equals(oldCourseID)) {
-                        oldCourse.add(course);
-                    }
-
-                }
-                if (student.getStudentEnrollCourseList().removeAll(oldCourse) && student.getStudentEnrollCourseList().add(newCourse)){
-                    logger.info("Swap Course:" + oldCourseID + "->" + newCourseID + ":" + " Swap Successful");
-                    return "Swap Course Successful";
-                } else {
-                    logger.info("Swap Course:" + oldCourseID + "->" + newCourseID + ":" + " Swap Fail");
-                    return "Swap Fail";
-                }
-
-            }else {
-                logger.info("Swap Course:" + oldCourseID + "->" + newCourseID + ":" + " Swap Fail");
-                return "Swap Fail!";
-            }
+        Student student;
+        if (studentMap.keySet().contains(studentId)) {
+            student = studentMap.get(studentId);
         } else {
-            logger.info("Swap Course:" + oldCourseID + "->" + newCourseID + ":" + " Do Not Allow Swap Course!");
-            return "Do Not Allow Swap Course!";
+            student = new Student(studentId);
+            studentMap.put(studentId, student);
         }
-    }
 
-    public String checkEnroll(String studentID, String newCourseID, String oldCourseID , String semester) {
-        String result = "";
-        String newCourseDepartment = newCourseID.substring(0,4);
-        if (newCourseDepartment.equals(this.department)){
-
-            Course newCourse = compCourseDatabase.get(semester).get(newCourseID);
-
-            if (newCourse != null){
-                synchronized (newCourse) {
-                    if (newCourse.getCapacity() - newCourse.getEnrollNumber() > 0){
-
-                        String dropResult = dropOldCourse(studentID, oldCourseID, semester);
-
-                        if (dropResult.contains("Successful")){
-                            if (newCourse.getStudentList().add(studentID)){
-
-                                newCourse.setEnrollNumber(newCourse.getEnrollNumber() + 1);
-                                return "Successful";
-
-                            }else{
-                                return "Fail";
-                            }
-                        }else{
-                            return "Fail";
-                        }
-                    } else{
-                        return "Fail";
-                    }
-                }
+        HashMap<String, ArrayList<String>> classSchedule = student.getEnrolledCourse();
+        ArrayList<String> classes = new ArrayList<>();
+        for (String semes : classSchedule.keySet()) {
+            if (classSchedule.get(semes).size() == 0) {
+                continue;
             } else {
-                return "Fail";
-            }
-        } else {
-            String message = "checkEnroll " + studentID + " " + newCourseID + " " + oldCourseID + " " + semester;
-            try {
-                result = sendMessage(message, getPort(newCourseDepartment));
-                return result;
-            } catch (Exception e) {
-                e.printStackTrace();
+                ArrayList<String> semesterClasses = classSchedule.get(semes);
+                for (String semesterClass : semesterClasses) {
+                    classes.add(semesterClass + "--" + semes);
+                }
             }
         }
+
+        String[] result = new String[classes.size()];
+        int index = 0;
+        for (String c : classes) {
+            result[index] = c;
+            index++;
+        }
+        Arrays.sort(result);
         return result;
     }
 
-    public String dropOldCourse(String studentID, String oldCourseID, String semester) {
-        String result = "";
-        String oldCourseDepartment = oldCourseID.substring(0,4);
-        if (oldCourseDepartment.equals(this.department)){
-
-            result = dropLocalCourse(studentID, oldCourseID, semester);
-            return result;
-
-        } else {
-            String message = "dropOldCourse " + studentID + " " + oldCourseID + " " + semester;
-            try {
-                result = sendMessage(message, getPort(oldCourseDepartment));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return result;
-        }
+    private void removeStudentCourse(Student student, String semester, String courseId){
+        HashMap<String, ArrayList<String>> enrolledMap = student.getEnrolledCourse();
+        ArrayList<String> enrolledList = enrolledMap.get(semester);
+        enrolledList.remove(courseId);
+        student.setEnrolledCourse(semester, enrolledList);
     }
 
-    private boolean checkStudentAllowEnrol(String studentId,String newCourseId, String oldCourseId) {
-        int localCourse = 0;
-        int otherDepartmentCourse = 0;
-        if (newCourseId.substring(0,4).equals(studentId.substring(0,4))){
-            localCourse ++;
-        } else {
-            otherDepartmentCourse ++;
-        }
-        if(oldCourseId.substring(0,4).equals(studentId.substring(0,4))){
-            localCourse --;
-        }else {
-            otherDepartmentCourse --;
-        }
-        Student student = studentEnrollDatabase.get(studentId);
-        if (student != null ){
-            List<Course> courses = student.getStudentEnrollCourseList();
-            for(Course course : courses){
-                if(course.getCourseName().substring(0,4).equals(studentId.substring(0,4))){
-                    localCourse ++;
-                } else {
-                    otherDepartmentCourse ++;
-                }
-            }
-            if(localCourse + otherDepartmentCourse > 3){
-                return false;
-            } else if(otherDepartmentCourse > 2){
-                return false;
-            } else if( localCourse > 3){
-                return false;
-            } else {
-                return true;
-            }
-        }else {
+    private Boolean departmentCheck(String courseId) {
+        String courseDepart = getDepartment(courseId);
+        if (!courseDepart.equals(this.department)) {
             return false;
         }
+        return true;
     }
 
-    public String checkWhetherCanEnrollAndEnroll(String studentId , String newCourseId ,String semester){
-        String result = "";
-        //本地或者远程两种情况
-        String department = newCourseId.substring(0,4);
-        if(this.department.equals(department)){
-            //本地
-            //查看是否允许enroll
-            Course course = compCourseDatabase.get(semester).get(newCourseId);
-
-            synchronized (course){
-                if (course != null ){
-                    if (course.getCapacity() - course.getEnrollNumber() > 0){
-                        //执行enroll操作
-                        course.setEnrollNumber(course.getEnrollNumber() + 1);
-                        course.getStudentList().add(studentId);
-
-                        result = "Successful";
-                        return result;
-                    } else {
-                        return "Swap Fail";
-                    }
-                }else {
-                    return "Swap Fail";
-                }
-            }
-        } else {
-            String message = "checkWhetherCanEnrollAndEnroll " + studentId + " " + newCourseId  + " " + semester;
-            try{
-                result = sendMessage(message, getPort(department));
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-            return result;
-        }
-
-    }
-
-    private boolean checkLocalStuListHaveOldCourseAndNoNewCourse(String studentId, String oldCourseId, String newCourseId ) {
-        boolean findOldCourse = false;
-        boolean findNewCourse = false;
-        Student student = studentEnrollDatabase.get(studentId);
-        List<Course> courses = student.getStudentEnrollCourseList();
-        for (Course course :
-                courses) {
-            if (course.getCourseName().equals(oldCourseId)){
-                findOldCourse = true;
-            }
-            if (course.getCourseName().equals(newCourseId)){
-                findNewCourse = true;
-            }
-        }
-        return (findOldCourse && !findNewCourse);
-    }
-
-    private String findSemester(Student student, String oldCourseId){
-        String semester = "";
-        List<Course> courses = student.getStudentEnrollCourseList();
-        for (Course course :
-                courses) {
-            if (course.getCourseName().equals(oldCourseId)){
-                semester = course.getSemester();
-            }
-        }
-        return semester;
-    }
-
-    public String checkDropAndEnroll(String studentId, String newCourseID, String oldCourseId ,String semester) {
-        String result = "Swap Course Fail!";
-        String department = oldCourseId.substring(0,4);
-        if(this.department.equals(department)){
-            Course course = compCourseDatabase.get(semester).get(oldCourseId);
-            List<String> studentNameList = course.getStudentList();
-
-            boolean findStuName = false;
-            for (int i = 0; i < studentNameList.size(); i++) {
-                if (studentNameList.get(i).equals(studentId)){
-                    findStuName = true;
-                }
-            }
-
-            if (findStuName){
-                result = checkWhetherCanEnrollAndEnroll(studentId, newCourseID, semester);
-
-                if (result.contains("Successful")){
-                    if(dropLocalCourse(studentId,oldCourseId,semester).contains("Successful")){
-                        result = "Swap Course Successful";
-                        return result;
-                    } else {
-                        return "Swap Course Fail!";
-                    }
-
-                } else {
-                    return "Swap Course Fail!";
-                }
-
-            }else {
-                result = "Swap Course Fail!";
-                return result;
-            }
-
-        }else {
-            //远程
-            String message = "checkDropAndEnroll " + studentId + " " + newCourseID + " " + oldCourseId + " " + semester;
-            try{
-                result = sendMessage(message, getPort(department));
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-
-        }
-        return result;
-    }
-
-    private void notifyOtherDepartment(String courseId) throws Exception {
-        String message = "dropRemovedCourseFromStuCourList " + courseId;
+    private String groupSend(String message) {
+        String reply = "";
         if (this.department.equals("comp")){
-            sendMessage(message , getPort("inse"));
-            sendMessage(message , getPort("soen"));
-        } else if(this.department.equals("inse")){
-            sendMessage(message , getPort("comp"));
-            sendMessage(message , getPort("soen"));
+            String reply1 = UdpClient.request(message , Config.UDP_SOEN_PORT);
+            String reply2 = UdpClient.request(message , Config.UDP_INSE_PORT);
+            reply = reply1 + reply2;
         } else if(this.department.equals("soen")){
-            sendMessage(message , getPort("comp"));
-            sendMessage(message , getPort("inse"));
+            String reply1 = UdpClient.request(message , Config.UDP_COMP_PORT);
+            String reply2 = UdpClient.request(message , Config.UDP_INSE_PORT);
+            reply = reply1 + reply2;
+        } else if(this.department.equals("inse")){
+            String reply1 = UdpClient.request(message , Config.UDP_COMP_PORT);
+            String reply2 = UdpClient.request(message , Config.UDP_SOEN_PORT);
+            reply = reply1 + reply2;
         }
+
+        return reply;
     }
 
-    public String dropRemovedCourseFromStuCourList(String courseId){
-        List<String> studentList = new ArrayList<>();
-        synchronized (studentEnrollDatabase){
-            for (Map.Entry<String,Student> studentEntry:
-                    studentEnrollDatabase.entrySet()) {
-                List<Course> courseList = studentEntry.getValue().getStudentEnrollCourseList();
-
-                for (int i = 0; i < courseList.size(); i++) {
-                    if(courseList.get(i).getCourseName().equals(courseId)){
-                        studentList.add(studentEntry.getKey());
-                        studentEntry.getValue().getStudentEnrollCourseList().remove(i);
-                    }
-                }
-            }
-        }
-        return "Remove Successful";
-    }
-
-    protected List<String> getLocalCourseList(String semester){
-        List<String> courseList = new ArrayList<>();
-
-        //get local data
-        ConcurrentHashMap<String, Course> courseMap = compCourseDatabase.get(semester);
-
-        if (courseMap == null) {
-            return courseList;
-        }
-
-        for (Map.Entry<String, Course> entry: courseMap.entrySet()){
-            Course course = entry.getValue();
-//            if (course.getCapacity() - course.getEnrollNumber() > 0){
-            if (course.getCapacity() - course.getEnrollNumber() >= 0){
-                courseList.add(entry.getKey() + "--"+ (entry.getValue().getCapacity() - entry.getValue().getEnrollNumber()));
-            }
-        }
-
-        return courseList;
-    }
-
-    private String getRemoteCourseList(String message1 , int port1, String message2 , int port2) throws Exception {
-        String receive1 = sendMessage(message1, port1);
-        String receive2 = sendMessage(message2, port2);
-        return receive1 + receive2;
-    }
-
-    private boolean enrollInOtherDepartment(String studentId, String semester, String department) {
-        int courseNum = 0;
-        Student student = studentEnrollDatabase.get(studentId);
-        if (student == null){
-            return false;
-        } else{
-            List<Course> courses = student.getStudentEnrollCourseList();
-            for (Course course : courses){
-                if (course.getSemester().equals(semester) && !course.getCourseName().substring(0,4).equals(this.department)){
-                    courseNum = courseNum + 1;
-                }
-            }
-            return (courseNum < 2);
-        }
-    }
-
-    private boolean allowToEnroll(String studentId,String courseId, String semester) {
-        if (!studentId.substring(0,4).equals(this.department) && !compCourseDatabase.get(semester).get(courseId).getStudentList().contains(studentId)) return true;
-        if (compCourseDatabase.get(semester).get(courseId).getStudentList().contains(studentId)) return false;
-        int courseNum = 0;
-        Student student = studentEnrollDatabase.get(studentId);
-        List<Course> courses = student.getStudentEnrollCourseList();
-        for (Course course :
-                courses) {
-            if (course.getSemester().equals(semester)){
-                courseNum = courseNum + 1;
-            }
-        }
-        return (courseNum < 3);
-    }
-
-    public String dropLocalCourse(String studentId, String courseId, String semester) {
-        String result = "";
-        ConcurrentHashMap<String, Course> courseMap = compCourseDatabase.get(semester);
-        Course course = courseMap.get(courseId);
-        List<String> studentIdList = course.getStudentList();
-
-        if (studentIdList.contains(studentId)){
-            synchronized (course){
-                if(studentIdList.remove(studentId)){
-                    course.setEnrollNumber(course.getEnrollNumber() - 1);
-                    result = "Drop Successful!";
-                } else{
-                    result = "Drop Fail";
-                }
-            }
-        } else {
-            result = "Drop Successful!";
-        }
-
+    private String getDepartment(String id) {
+        String result = id.substring(0, 4);
         return result;
     }
 
-    private int getPort(String department){
-        int port;
-        if (department.equals("comp")){
-            port = departmentPort.DEPARTMENT_PORT.COMP;
-        } else if(department.equals("soen")){
-            port = departmentPort.DEPARTMENT_PORT.SOEN;
-        } else {
-            port = departmentPort.DEPARTMENT_PORT.INSE;
+    private int getUDPPort(String department) {
+        int result = 0;
+        if (department.equals("comp")) {
+            result = Config.UDP_COMP_PORT;
+        } else if (department.equals("soen")) {
+            result = Config.UDP_SOEN_PORT;
+        } else if (department.equals("inse")) {
+            result = Config.UDP_INSE_PORT;
         }
-        return port;
+        return result;
     }
 
-
-    private String sendMessage(String message, int port) throws Exception{
-        logger.info("Client Send Request :" + message);
-        InetAddress address = InetAddress.getByName("localhost");
-
-        byte[] data = message.getBytes();
-        DatagramPacket sendPacket = new DatagramPacket(data, data.length, address, port);
-
-        DatagramSocket socket = new DatagramSocket();
-
-        socket.send(sendPacket);
-
-        byte[] receiveData = new byte[1024];
-        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-        socket.receive(receivePacket);
-        String info = new String(receiveData, 0, receivePacket.getLength());
-        logger.info("Client Recv Response :" + info);
-        socket.close();
-        return info;
+    private String getSemester(String courseId) {
+        if (departmentCheck(courseId)) {
+            return getLocalSemester(courseId);
+        } else {
+            String courseDepartment = getDepartment(courseId);
+            int receiverPort = getUDPPort(courseDepartment);
+            String message = "getSemester," + courseId;
+            String reply = UdpClient.request(message, receiverPort).trim();
+            return reply;
+        }
     }
 
-}
-
-enum departmentPort{
-    DEPARTMENT_PORT;
-    final int COMP = 5556;
-    final int SOEN = 5557;
-    final int INSE = 5558;
+    private String checkAvailability(String courseId) {
+        if (departmentCheck(courseId)) {
+            return checkLocalAvailbility(courseId);
+        } else {
+            String courseDepartment = getDepartment(courseId);
+            int receiverPort = getUDPPort(courseDepartment);
+            String message = "checkAvailability," + courseId;
+            String reply = UdpClient.request(message, receiverPort);
+            return reply;
+        }
+    }
 }
