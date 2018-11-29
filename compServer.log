@@ -1,13 +1,18 @@
-[Thu Nov 22 12:05:46 EST 2018] [INFO] Add Course                              |comp1 fall                              |Add Successful                          |
-[Thu Nov 22 12:05:46 EST 2018] [INFO] Add Course                              |comp2 fall                              |Add Successful                          |
-[Thu Nov 22 12:05:50 EST 2018] [INFO] Client Send Request                     |dropRemovedCourseFromStuCourList comp1  |
-[Thu Nov 22 12:05:50 EST 2018] [INFO] Client Recv Response                    |Remove Successful                       |
-[Thu Nov 22 12:05:50 EST 2018] [INFO] Client Send Request                     |dropRemovedCourseFromStuCourList comp1  |
-[Thu Nov 22 12:05:50 EST 2018] [INFO] Client Recv Response                    |Remove Successful                       |
-[Thu Nov 22 12:05:50 EST 2018] [INFO] Remove Course                           |comp1 fall                              | Remove Successful                      |
-[Thu Nov 22 12:07:31 EST 2018] [INFO] Remove Course                           |comp1 fall                              |The Course Doesn't Exist                |
-[Thu Nov 22 12:07:31 EST 2018] [INFO] List Course Availability                |fall                                    |
-[Thu Nov 22 12:07:31 EST 2018] [INFO] Client Send Request                     |listCourseAvailability fall             |
-[Thu Nov 22 12:07:31 EST 2018] [INFO] Client Recv Response                    |soen1--2 soen2--2                       |
-[Thu Nov 22 12:07:31 EST 2018] [INFO] Client Send Request                     |listCourseAvailability fall             |
-[Thu Nov 22 12:07:31 EST 2018] [INFO] Client Recv Response                    |inse2--2 inse1--2                       |
+[Wed Nov 28 23:26:55 EST 2018] [INFO] Add Course                              |comp1 fall                              |Add Successful                          |
+[Wed Nov 28 23:26:55 EST 2018] [INFO] Add Course                              |comp2 fall                              |Add Successful                          |
+[Wed Nov 28 23:26:57 EST 2018] [INFO] Add Course                              |comp1 fall                              |The Course Have Already Added!          |
+[Wed Nov 28 23:26:57 EST 2018] [INFO] Add Course                              |comp2 fall                              |The Course Have Already Added!          |
+[Wed Nov 28 23:26:57 EST 2018] [INFO] Add Course                              |comp3 fall                              |Add Successful                          |
+[Wed Nov 28 23:26:57 EST 2018] [INFO] Enroll Course                           |comps1234 comp1 fall                    |comp1 Enroll Successfully               |
+[Wed Nov 28 23:26:57 EST 2018] [INFO] 
+UDP AT PORT comp SEND REQUEST TO 6667  |
+SWAP COMPS1234 SOEN1 COMP1             |
+[Wed Nov 28 23:26:57 EST 2018] [INFO] 
+UDP AT PORT comp SEND REQUEST TO 6668  |
+SWAP_ENROL COMPS1234 SOEN1 COMP1       |
+[Wed Nov 28 23:26:57 EST 2018] [INFO] 
+UDP AT PORT comp GET REPLY FROM 6668   |
+SWAP COURSE SUCCESSFUL!                |
+[Wed Nov 28 23:26:57 EST 2018] [INFO] 
+UDP AT PORT comp GET REPLY FROM 6667   |
+SWAP COURSE SUCCESSFUL!                |

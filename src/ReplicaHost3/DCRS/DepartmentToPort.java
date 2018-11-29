@@ -6,8 +6,8 @@ import java.util.Map;
 public class DepartmentToPort {
     static public Map<String, Integer> map = new HashMap<>();
     static {
-        map.put("COMP", 6666);
-        map.put("SOEN", 7777);
-        map.put("INSE", 8888);
+        map.put("comp", 6667);
+        map.put("soen", 6668);
+        map.put("inse", 6669);
     }
 }

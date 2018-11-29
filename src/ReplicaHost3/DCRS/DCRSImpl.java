@@ -20,14 +20,31 @@ public class DCRSImpl {
         this.courseSchedule.put("winter", new HashMap<>());
         this.courseSchedule.put("summer", new HashMap<>());
         this.logger = logger;
+
+        this.init();
+    }
+
+    private void init() {
+        if (departmentTag.equals("comp")){
+            addCourse("comp1","fall");
+            addCourse("comp2","fall");
+        }
+        if (departmentTag.equals("soen")){
+            addCourse("soen1","fall");
+            addCourse("soen2","fall");
+        }
+        if (departmentTag.equals("inse")){
+            addCourse("inse1","fall");
+            addCourse("inse2","fall");
+        }
     }
 
     public String swapCourseDropReply(String studentID,String oldCourseID) {
         Course course = this.searchCourse(oldCourseID);
-        if (course == null) return "Swap Fail";
+        if (course == null) return "Swap Fail!";
         if(course.drop(studentID))
-            return "Swap Course Successful";
-        else return "Swap Fail";
+            return "Swap Course Successful!";
+        else return "Swap Fail!";
     }
 
     public String swapCourseEnrolRequest(String studentID, String newCourseID, String oldCourseID) {
@@ -35,10 +52,10 @@ public class DCRSImpl {
         Course course = this.searchCourse(newCourseID);
         synchronized (course) {
             if (course.isStatusFull())
-                return "Swap Fail";
+                return "Swap Fail!";
             String[] param = {"swap_drop", studentID,  oldCourseID};
             String res = send(dataProcess(param), oldCourseID.substring(0, 4));
-            if (res.contains("Successful"))
+            if (res.contains("Successful!"))
                 course.swapEnrol(studentID);
             return res;
         }
@@ -48,11 +65,11 @@ public class DCRSImpl {
         // check is the new course in the local server
         if (checkDepartment(newCourseID)) {
             // check is the two courses in the same semester
-            if (!checkIsInSameSemester(newCourseID, oldCourseID)) return "Swap Fail";
+            if (!checkIsInSameSemester(newCourseID, oldCourseID)) return "Swap Fail!";
             // run local course exchange, if success return SUCCESS
             if(!swapLocalCourse(studentID, newCourseID, oldCourseID))
-               return "Swap Fail";
-            return "Swap Course Successful";
+               return "Swap Fail!";
+            return "Swap Course Successful!";
         }
         String[] param = {"swap_enrol", studentID, newCourseID, oldCourseID};
         String res = this.send(dataProcess(param), newCourseID.substring(0, 4));
@@ -72,25 +89,25 @@ public class DCRSImpl {
         if(student == null)
             students.put(studentID, new Student(studentID));
         if (!student.checkCourse(oldCourseID))
-            return "Swap Fail";
+            return "Swap Fail!";
         if (student.checkCourse(newCourseID))
-            return "Swap Fail";
+            return "Swap Fail!";
         int numberIfSwap = student.getRemoteCourseNumberIfSwap(oldCourseID, newCourseID);
         if (numberIfSwap > 2)
-            return "Swap Fail";
+            return "Swap Fail!";
         if (numberIfSwap == -1)
-            return "Swap Fail";
+            return "Swap Fail!";
         if (checkDepartment(newCourseID) && checkDepartment(oldCourseID)) {
             if (!checkIsInSameSemester(newCourseID, oldCourseID))
-                return "Swap Fail";
+                return "Swap Fail!";
             if(!swapLocalCourse(studentID, newCourseID, oldCourseID))
-                return "Swap Fail";
+                return "Swap Fail!";
             student.swapCourse(oldCourseID, newCourseID);
-            return "Swap Course Successful";
+            return "Swap Course Successful!";
         }
         String[] param = {"swap", studentID, newCourseID, oldCourseID};
         String res = this.send(dataProcess(param), oldCourseID.substring(0, 4));
-        if (res.contains("Successful")) {
+        if (res.contains("Successful!")) {
             student.swapCourse(oldCourseID, newCourseID);
         }
         return res;
@@ -198,7 +215,7 @@ public class DCRSImpl {
             }
             else {
                 logger.info("Enroll Course :" + studentID + " " + courseID + " " + semester + ":" + "Do not allow to enroll");
-                return "Do not allow to enroll";
+                return (courseID + " Do not allow to enroll");
             }
         }
         if (!students.containsKey(studentID)) {
@@ -219,7 +236,7 @@ public class DCRSImpl {
             int remoteCourseNum = student.getRemoteCourseNum(semester);
             if (remoteCourseNum == 2) {
                 logger.info("Enroll Course :" + studentID + " " + courseID + " " + semester + ":" + "Do not allow to enroll");
-                return "Do not allow to enroll";
+                return (courseID + " Do not allow to enroll");
             }
             String[] param = {"enrol", studentID, courseID, semester};
             String res = this.send(dataProcess(param), courseID.substring(0, 4));
@@ -307,6 +324,7 @@ public class DCRSImpl {
         try {
             aSocket = new DatagramSocket();
             DatagramPacket packet = new DatagramPacket(message, message.length, InetAddress.getByName("localhost"), DepartmentToPort.map.get(dest));
+            System.out.println(data);
             aSocket.send(packet);
             byte data2[] = new byte[1024];
             DatagramPacket packet2 = new DatagramPacket(data2, data2.length);
