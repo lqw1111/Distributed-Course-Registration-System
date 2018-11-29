@@ -4,6 +4,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,6 +13,7 @@ import java.util.logging.Logger;
 
 public class DCRSImpl {
 
+    public boolean bug;
     public Logger logger;
     public String department;
     public ConcurrentHashMap<String, ConcurrentHashMap<String, Course>> compCourseDatabase = new ConcurrentHashMap<String, ConcurrentHashMap<String, Course>>();
@@ -23,6 +25,7 @@ public class DCRSImpl {
     public DCRSImpl(String department, Logger logger){
         this.department = department;
         this.logger = logger;
+        this.bug = false;
 
         ConcurrentHashMap<String, Course> fallCourse = new ConcurrentHashMap<String, Course>();
         compCourseDatabase.put("fall", fallCourse);
@@ -44,7 +47,7 @@ public class DCRSImpl {
         Student student9 = new Student(department + "s9999",new ArrayList<Course>());
         Student student10 = new Student(department + "s1010",new ArrayList<Course>());
 
-
+        studentEnrollDatabase.put(department + "s1111",student1);
         studentEnrollDatabase.put(department + "s2222",student2);
         studentEnrollDatabase.put(department + "s3333",student3);
         studentEnrollDatabase.put(department + "s4444",student4);
@@ -136,16 +139,17 @@ public class DCRSImpl {
             String courseAvailibleList = "";
             String message = "listCourseAvailability " + semester;
             if (this.department.equals("comp")){
-                courseAvailibleList = getRemoteCourseList(message,2223, message,3334);
+                courseAvailibleList = getRemoteCourseList(message,departmentPort.DEPARTMENT_PORT.SOEN, message,departmentPort.DEPARTMENT_PORT.INSE);
 
             } else if(this.department.equals("inse")){
-                courseAvailibleList = getRemoteCourseList(message,2223, message,1112);
+                courseAvailibleList = getRemoteCourseList(message,departmentPort.DEPARTMENT_PORT.SOEN, message,departmentPort.DEPARTMENT_PORT.COMP);
 
             } else if(this.department.equals("soen")){
-                courseAvailibleList = getRemoteCourseList(message,1112, message,3334);
+                courseAvailibleList = getRemoteCourseList(message,departmentPort.DEPARTMENT_PORT.COMP, message,departmentPort.DEPARTMENT_PORT.INSE);
             }
 
             String[] courses = courseAvailibleList.split(" ");
+            Arrays.sort(courses);
             for (String course :
                     courses) {
                 if (!course.equals("")){
@@ -172,7 +176,8 @@ public class DCRSImpl {
     public String enrolCourse(String studentId, String courseId, String semester) {
         String result = "";
         if (studentEnrollDatabase.get(studentId) == null && this.department.equals(studentId.substring(0,4))) {
-            return "The Student Does Not Exist! Please Contact With Advisor!";
+            Student student = new Student(studentId,new ArrayList<Course>());
+            studentEnrollDatabase.put(studentId, student);
         }
 
         String department = courseId.substring(0,4);
@@ -229,7 +234,8 @@ public class DCRSImpl {
     public String dropCourse(String studentId, String courseId) {
 
         if (studentEnrollDatabase.get(studentId) == null && this.department.equals(studentId.substring(0,4))) {
-            return "The Student Does Not Exist! Please Contact With Advisor!";
+            Student student = new Student(studentId ,new ArrayList<Course>());
+            studentEnrollDatabase.put(studentId, student);
         }
 
         boolean findTargetCourse = false;
@@ -307,10 +313,10 @@ public class DCRSImpl {
                 }
                 if (student.getStudentEnrollCourseList().removeAll(oldCourse) && student.getStudentEnrollCourseList().add(newCourse)){
                     logger.info("Swap Course:" + oldCourseID + "->" + newCourseID + ":" + " Swap Successful");
-                    return "Swap Course Successful";
+                    return "Swap Course Successful!";
                 } else {
                     logger.info("Swap Course:" + oldCourseID + "->" + newCourseID + ":" + " Swap Fail");
-                    return "Swap Fail";
+                    return "Swap Fail!";
                 }
 
             }else {
@@ -319,7 +325,7 @@ public class DCRSImpl {
             }
         } else {
             logger.info("Swap Course:" + oldCourseID + "->" + newCourseID + ":" + " Do Not Allow Swap Course!");
-            return "Do Not Allow Swap Course!";
+            return "Swap Fail!";
         }
     }
 
@@ -651,11 +657,11 @@ public class DCRSImpl {
     private int getPort(String department){
         int port;
         if (department.equals("comp")){
-            port = 1112;
+            port = departmentPort.DEPARTMENT_PORT.COMP;
         } else if(department.equals("soen")){
-            port = 2223;
+            port = departmentPort.DEPARTMENT_PORT.SOEN;
         } else {
-            port = 3334;
+            port = departmentPort.DEPARTMENT_PORT.INSE;
         }
         return port;
     }
@@ -681,4 +687,11 @@ public class DCRSImpl {
         return info;
     }
 
+}
+
+enum departmentPort{
+    DEPARTMENT_PORT;
+    final int COMP = 1112;
+    final int SOEN = 2223;
+    final int INSE = 3334;
 }
