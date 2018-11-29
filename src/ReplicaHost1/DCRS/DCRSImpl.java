@@ -224,7 +224,7 @@ public class DCRSImpl {
                     e.printStackTrace();
                 }
             }else{
-                result = "Do not allow to enroll";
+                result = courseId + " Do not allow to enroll";
             }
 
         }
