@@ -158,7 +158,7 @@ public class DCRSImpl {
                 }
             }
         } else {
-            result = "Do not allow to enroll";
+            result = courseID+" Do not allow to enroll";
         }
 
         this.log.info("Enroll Course :" + studentID + " " + courseID + " " + semester + ":" + result);
