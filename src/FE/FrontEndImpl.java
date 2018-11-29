@@ -14,6 +14,15 @@ import java.util.Map;
 public class FrontEndImpl extends FrontEndPOA {
 
     private ORB orb;
+    private Map<String, Integer> softwareFailCounter;
+
+    public FrontEndImpl(){
+        softwareFailCounter = new HashMap<String,Integer>();
+        softwareFailCounter.put("1",0);
+        softwareFailCounter.put("2",0);
+        softwareFailCounter.put("3",0);
+        softwareFailCounter.put("4",0);
+    }
 
     public void setORB(ORB orb_val) {
         orb = orb_val;
@@ -47,7 +56,7 @@ public class FrontEndImpl extends FrontEndPOA {
                 count = registerListener(socket, resultSet);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
 
@@ -121,8 +130,9 @@ public class FrontEndImpl extends FrontEndPOA {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            socket.close();
         }
-
 
         if (resultSet.size() < 4){
             tellRMCrash(resultSet);
@@ -349,14 +359,24 @@ public class FrontEndImpl extends FrontEndPOA {
     private void findSoftwareFail(String candidate, Integer vote, Map<String, String> resultSet) {
         if (vote == 4)
             return;
-        String crashServerNum = null;
+        String failServerNum = null;
         for (Map.Entry<String, String> entry : resultSet.entrySet()){
             if (!entry.getValue().equals(candidate)){
-                crashServerNum = entry.getKey();
+                failServerNum = entry.getKey();
             }
         }
-        if (null != crashServerNum){
-            sendToRM(crashServerNum);
+        if (null != failServerNum){
+            for (Map.Entry<String,Integer> entry:
+                 softwareFailCounter.entrySet()) {
+                if (!entry.getKey().equals(failServerNum)){
+                    entry.setValue(0);
+                } else if(entry.getKey().equals(failServerNum)){
+                    entry.setValue(entry.getValue() + 1);
+                }
+            }
+        }
+        if (softwareFailCounter.get(failServerNum) != null && softwareFailCounter.get(failServerNum) == 3){
+            sendToRM(failServerNum);
         }
     }
 
@@ -370,19 +390,19 @@ public class FrontEndImpl extends FrontEndPOA {
 
             if (crashServerNum.equals("1")){
                 InetAddress address = InetAddress.getByName(AddressInfo.ADDRESS_INFO.RM1address);
-                DatagramPacket packet = new DatagramPacket(data, 0, data.length,address,Replica.REPLICA.replica1 );
+                DatagramPacket packet = new DatagramPacket(data, 0, data.length,address,6001 );
                 socket.send(packet);
             } else if (crashServerNum.equals("2")){
                 InetAddress address = InetAddress.getByName(AddressInfo.ADDRESS_INFO.RM2address);
-                DatagramPacket packet = new DatagramPacket(data, 0, data.length,address,Replica.REPLICA.replica2 );
+                DatagramPacket packet = new DatagramPacket(data, 0, data.length,address,6002);
                 socket.send(packet);
             } else if (crashServerNum.equals("3")){
                 InetAddress address = InetAddress.getByName(AddressInfo.ADDRESS_INFO.RM3address);
-                DatagramPacket packet = new DatagramPacket(data, 0, data.length,address,Replica.REPLICA.replica3 );
+                DatagramPacket packet = new DatagramPacket(data, 0, data.length,address,6003 );
                 socket.send(packet);
             } else {
                 InetAddress address = InetAddress.getByName(AddressInfo.ADDRESS_INFO.RM4address);
-                DatagramPacket packet = new DatagramPacket(data, 0, data.length,address,Replica.REPLICA.replica4 );
+                DatagramPacket packet = new DatagramPacket(data, 0, data.length,address,6004 );
                 socket.send(packet);
             }
         } catch (SocketException e) {
@@ -419,8 +439,12 @@ public class FrontEndImpl extends FrontEndPOA {
             socket.receive(packet);
             String result = new String(packet.getData(), 0 , packet.getLength());
 
+            System.out.println("receive " + result);
+
             String[] res = result.split(":");
             resultSet.put(res[0], res[1]);
+
+        } catch (SocketException e){
 
         } catch (IOException e) {
             e.printStackTrace();

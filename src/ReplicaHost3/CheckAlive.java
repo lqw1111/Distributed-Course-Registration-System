@@ -3,6 +3,7 @@ package ReplicaHost3;
 import PortInfo.AddressInfo;
 import PortInfo.AlivePort;
 import PortInfo.Replica;
+import PortInfo.Replication;
 
 import java.io.IOException;
 import java.net.*;
@@ -17,16 +18,16 @@ public class CheckAlive implements Runnable{
     public void run() {
         switch (crashServerNum){
             case "1" :
-                checkEcho(AddressInfo.ADDRESS_INFO.RM1address,Replica.REPLICA.replica1, AlivePort.ALIVE_PORT.RM1);
+                checkEcho(AddressInfo.ADDRESS_INFO.RM1address,Replication.REPLICATION.Replica1, AlivePort.ALIVE_PORT.RM1);
                 break;
             case "2" :
-                checkEcho(AddressInfo.ADDRESS_INFO.RM2address,Replica.REPLICA.replica2, AlivePort.ALIVE_PORT.RM2);
+                checkEcho(AddressInfo.ADDRESS_INFO.RM2address,Replication.REPLICATION.Replica2, AlivePort.ALIVE_PORT.RM2);
                 break;
             case "3" :
-                checkEcho(AddressInfo.ADDRESS_INFO.RM3address,Replica.REPLICA.replica3, AlivePort.ALIVE_PORT.RM3);
+                checkEcho(AddressInfo.ADDRESS_INFO.RM3address,Replication.REPLICATION.Replica3, AlivePort.ALIVE_PORT.RM3);
                 break;
             case "4" :
-                checkEcho(AddressInfo.ADDRESS_INFO.RM4address,Replica.REPLICA.replica4, AlivePort.ALIVE_PORT.RM4);
+                checkEcho(AddressInfo.ADDRESS_INFO.RM4address,Replication.REPLICATION.Replica4, AlivePort.ALIVE_PORT.RM4);
                 break;
             default:
                 System.out.println("Invaild Number");
@@ -52,7 +53,7 @@ public class CheckAlive implements Runnable{
 
 
         } catch (SocketException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
 
             //Get Timeout Exception
             TellRM(RMaddress, alivePort);

@@ -13,7 +13,7 @@ public class Timer implements Runnable {
     @Override
     public void run() {
         try {
-            Thread.sleep(2000);
+            Thread.sleep(5000);
             this.socket.close();
         } catch (InterruptedException e) {
             e.printStackTrace();

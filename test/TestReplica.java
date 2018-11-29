@@ -31,9 +31,12 @@ public class TestReplica {
     }
 
     public static void main(String[] args) throws IOException {
-//        sendRequest("comp","addCourse comp3 fall");
-        sendRequest("comp","removeCourse comp1 fall");
-        sendRequest("comp", "listCourseAvailability fall");
+        sendRequest("comp","enrolCourse comps1111 comp2 fall");
+//        sendRequest("comp","enrolCourse comps1111 inse1 fall");
+//        sendRequest("comp","enrolCourse comps1111 comp1 fall");
+//        sendRequest("comp","getClassSchedule comps1111");
+//        sendRequest("comp","removeCourse comp1 fall");
+//        sendRequest("comp", "listCourseAvailability fall");
 
 //        sendRequest("comp","addCourse comp3 fall");
 //        sendRequest("comp","addCourse comp3 fall");
