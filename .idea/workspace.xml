@@ -27,36 +27,54 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestReplica.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/TestReplica.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="185">
-              <caret line="92" column="5" lean-forward="true" selection-start-line="92" selection-start-column="5" selection-end-line="92" selection-end-column="5" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Replica1.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ReplicaHost1/Replica1.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="106">
-              <caret line="137" column="5" lean-forward="true" selection-start-line="137" selection-start-column="5" selection-end-line="137" selection-end-column="5" />
+              <caret line="137" column="5" lean-forward="false" selection-start-line="137" selection-start-column="5" selection-end-line="137" selection-end-column="5" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestReplicaCompara.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="TestReplicaCompara.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test/TestReplicaCompara.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="182">
+            <state relative-caret-position="382">
               <caret line="67" column="5" lean-forward="true" selection-start-line="67" selection-start-column="5" selection-end-line="67" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DCRSImpl.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ReplicaHost2/DCRS/DCRSImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-100">
+              <caret line="510" column="9" lean-forward="false" selection-start-line="510" selection-start-column="9" selection-end-line="510" selection-end-column="9" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UdpClient.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ReplicaHost2/DCRS/UdpClient.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="405">
+              <caret line="28" column="37" lean-forward="true" selection-start-line="28" selection-start-column="37" selection-end-line="28" selection-end-column="37" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UdpServer.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/ReplicaHost2/DCRS/UdpServer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="690">
+              <caret line="51" column="25" lean-forward="false" selection-start-line="51" selection-start-column="25" selection-end-line="51" selection-end-column="25" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -162,11 +180,11 @@
         <option value="$PROJECT_DIR$/src/ReplicaHost2/Replica2.java" />
         <option value="$PROJECT_DIR$/src/ReplicaHost1/Replica1.java" />
         <option value="$PROJECT_DIR$/src/ReplicaHost1/DCRS/DCRSImpl.java" />
-        <option value="$PROJECT_DIR$/test/TestReplicaCompara.java" />
         <option value="$PROJECT_DIR$/test/TestReplica.java" />
-        <option value="$PROJECT_DIR$/src/ReplicaHost2/DCRS/UdpClient.java" />
         <option value="$PROJECT_DIR$/src/ReplicaHost2/DCRS/UdpServer.java" />
+        <option value="$PROJECT_DIR$/test/TestReplicaCompara.java" />
         <option value="$PROJECT_DIR$/src/ReplicaHost2/DCRS/DCRSImpl.java" />
+        <option value="$PROJECT_DIR$/src/ReplicaHost2/DCRS/UdpClient.java" />
       </list>
     </option>
   </component>
@@ -216,27 +234,6 @@
               <item name="COMP6231Project" type="b2602c69:ProjectViewProjectNode" />
               <item name="COMP6231Project" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ReplicaHost1" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COMP6231Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COMP6231Project" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ReplicaHost1" type="462c0819:PsiDirectoryNode" />
-              <item name="DCRS" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COMP6231Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COMP6231Project" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ReplicaHost1" type="462c0819:PsiDirectoryNode" />
-              <item name="DCRS" type="462c0819:PsiDirectoryNode" />
-              <item name="DCRSImpl.java" type="529ef68f:ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
-            </path>
-            <path>
-              <item name="COMP6231Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COMP6231Project" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="ReplicaHost2" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -245,11 +242,6 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="ReplicaHost2" type="462c0819:PsiDirectoryNode" />
               <item name="DCRS" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="COMP6231Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="COMP6231Project" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -480,7 +472,7 @@
       <workItem from="1542906567105" duration="45893000" />
       <workItem from="1543100705855" duration="24265000" />
       <workItem from="1543296671648" duration="25693000" />
-      <workItem from="1543460887266" duration="12937000" />
+      <workItem from="1543460887266" duration="14433000" />
     </task>
     <servers />
   </component>
@@ -490,10 +482,11 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="160445000" />
+    <option name="totallyTimeSpent" value="161941000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -504,7 +497,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="REPL" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34662998" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34662998" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Leiningen" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
@@ -897,30 +890,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ReplicaHost2/DCRS/UdpServer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="403">
-          <caret line="51" column="25" lean-forward="false" selection-start-line="51" selection-start-column="25" selection-end-line="51" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ReplicaHost2/DCRS/UdpClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="24" column="62" lean-forward="true" selection-start-line="24" selection-start-column="62" selection-end-line="24" selection-end-column="62" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ReplicaHost2/DCRS/DCRSImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="197">
-          <caret line="554" column="37" lean-forward="false" selection-start-line="554" selection-start-column="37" selection-end-line="554" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/ReplicaHost2/Replica2.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="140">
@@ -934,7 +903,7 @@
     <entry file="file://$PROJECT_DIR$/test/TestReplica.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="185">
-          <caret line="92" column="5" lean-forward="true" selection-start-line="92" selection-start-column="5" selection-end-line="92" selection-end-column="5" />
+          <caret line="92" column="5" lean-forward="false" selection-start-line="92" selection-start-column="5" selection-end-line="92" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -944,18 +913,42 @@
     <entry file="file://$PROJECT_DIR$/src/ReplicaHost1/Replica1.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="106">
-          <caret line="137" column="5" lean-forward="true" selection-start-line="137" selection-start-column="5" selection-end-line="137" selection-end-column="5" />
+          <caret line="137" column="5" lean-forward="false" selection-start-line="137" selection-start-column="5" selection-end-line="137" selection-end-column="5" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/TestReplicaCompara.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="182">
+        <state relative-caret-position="382">
           <caret line="67" column="5" lean-forward="true" selection-start-line="67" selection-start-column="5" selection-end-line="67" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ReplicaHost2/DCRS/DCRSImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-100">
+          <caret line="510" column="9" lean-forward="false" selection-start-line="510" selection-start-column="9" selection-end-line="510" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ReplicaHost2/DCRS/UdpClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="28" column="37" lean-forward="true" selection-start-line="28" selection-start-column="37" selection-end-line="28" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ReplicaHost2/DCRS/UdpServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="690">
+          <caret line="51" column="25" lean-forward="false" selection-start-line="51" selection-start-column="25" selection-end-line="51" selection-end-column="25" />
+          <folding />
         </state>
       </provider>
     </entry>
