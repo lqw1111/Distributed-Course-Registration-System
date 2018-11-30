@@ -240,18 +240,18 @@ public class DCRSImpl {
                         this.database.enrolCourse(studentID, newCourseID, newStatus);
                         this.database.dropCourse(studentID, oldCourseID);
                         this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Successful");
-                        result = "Swap Course Successful";
+                        result = "Swap Course Successful!";
                     } else {
                         this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                        result = "Swap Fail";
+                        result = "Swap Fail!";
                     }
                 } else {
                     this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                    result = "Swap Fail";
+                    result = "Swap Fail!";
                 }
             } else {
                 this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                result = "Swap Fail";
+                result = "Swap Fail!";
             }
         } else {
             DepartEnum newcourseDep;
@@ -284,7 +284,7 @@ public class DCRSImpl {
 
                         if (elevtiveCourseCount >= 2) {
                             this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                            result = "Swap Fail";
+                            result = "Swap Fail!";
                         } else {
                             checkEnrolAvail = "REQUEST_ENROL_AVAIL " + newCourseID + " " + newStatus;
                             dropSendMsg = this.serverToServer(newcourseDep, checkEnrolAvail);
@@ -293,19 +293,19 @@ public class DCRSImpl {
                                 sendEnrolMsg = "REQUEST_ENROLL " + studentID + " " + newCourseID + " " + newStatus;
                                 this.serverToServer(newcourseDep, sendEnrolMsg);
                                 this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Successful");
-                                result = "Swap Course Successful";
+                                result = "Swap Course Successful!";
                             } else {
                                 this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                                result = "Swap Fail";
+                                result = "Swap Fail!";
                             }
                         }
                     } else {
                         this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                        result = "Swap Fail";
+                        result = "Swap Fail!";
                     }
                 } else {
                     this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                    result = "Swap Fail";
+                    result = "Swap Fail!";
                 }
             } else if (studentDepart.equals(BcourseDepart) && !studentDepart.equals(AcourseDepart)) {
                 oldStatus = this.database.checkNewCourse(studentID, newCourseID);
@@ -320,18 +320,18 @@ public class DCRSImpl {
                             this.serverToServer(newcourseDep, dropSendMsg);
                             this.database.enrolCourse(studentID, newCourseID, oldStatus);
                             this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Successful");
-                            result = "Swap Course Successful";
+                            result = "Swap Course Successful!";
                         } else {
                             this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                            result = "Swap Fail";
+                            result = "Swap Fail!";
                         }
                     } else {
                         this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                        result = "Swap Fail";
+                        result = "Swap Fail!";
                     }
                 } else {
                     this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                    result = "Swap Fail";
+                    result = "Swap Fail!";
                 }
             } else {
                 DepartEnum oldcourseDep;
@@ -353,18 +353,18 @@ public class DCRSImpl {
                                 sendEnrolMsg = "REQUEST_ENROLL " + studentID + " " + newCourseID + " " + newStatus;
                                 this.serverToServer(oldcourseDep, sendEnrolMsg);
                                 this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Successful");
-                                result = "Swap Course Successful";
+                                result = "Swap Course Successful!";
                             } else {
                                 this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                                result = "Swap Fail";
+                                result = "Swap Fail!";
                             }
                         } else {
                             this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                            result = "Swap Fail";
+                            result = "Swap Fail!";
                         }
                     } else {
                         this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                        result = "Swap Fail";
+                        result = "Swap Fail!";
                     }
                 } else if (!studentDepart.equals(AcourseDepart) && !AcourseDepart.equals(BcourseDepart)) {
                     oldStatus = "null";
@@ -385,18 +385,18 @@ public class DCRSImpl {
                                 sendEnrolMsg = "REQUEST_ENROLL " + studentID + " " + newCourseID + " " + newStatus;
                                 this.serverToServer(newcourseDep, sendEnrolMsg);
                                 this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Successful");
-                                result = "Swap Course Successful";
+                                result = "Swap Course Successful!";
                             } else {
                                 this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                                result = "Swap Fail";
+                                result = "Swap Fail!";
                             }
                         } else {
                             this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                            result = "Swap Fail";
+                            result = "Swap Fail!";
                         }
                     } else {
                         this.log.info("Swap Course:" + oldCourseID + "->" + newCourseID + ": Swap Fail");
-                        result = "Swap Fail";
+                        result = "Swap Fail!";
                     }
                 }
             }
