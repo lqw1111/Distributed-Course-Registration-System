@@ -30,269 +30,283 @@ public class FrontEndImpl extends FrontEndPOA {
 
     @Override
     public String addCourse(String courseId, String semester){
-        //TODO:在此处的msg中添加department信息
-        String department = courseId.substring(0,4);
-        Map<String, String> resultSet = new HashMap<>();
-        DatagramSocket socket = null;
-        int count = 0;
-        StringBuilder sb = new StringBuilder();
+        synchronized (this){
+            //TODO:在此处的msg中添加department信息
+            String department = courseId.substring(0,4);
+            Map<String, String> resultSet = new HashMap<>();
+            DatagramSocket socket = null;
+            int count = 0;
+            StringBuilder sb = new StringBuilder();
 
-        try {
-            socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
+            try {
+                socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
 
-            sendRequest(sb.append(department)
-                    .append(":")
-                    .append("addCourse")
-                    .append(" ")
-                    .append(courseId)
-                    .append(" ")
-                    .append(semester).toString());
+                sendRequest(sb.append(department)
+                        .append(":")
+                        .append("addCourse")
+                        .append(" ")
+                        .append(courseId)
+                        .append(" ")
+                        .append(semester).toString());
 
-            FE.Timer timer = new FE.Timer(socket, false);
-            Thread thread = new Thread(timer);
-            thread.start();
-            //TODO:假设只发生一个failure
-            while(count < 4 && !timer.timeout) {
-                count = registerListener(socket, resultSet);
-            }
-        } catch (Exception e) {
+                FE.Timer timer = new FE.Timer(socket, false);
+                Thread thread = new Thread(timer);
+                thread.start();
+                //TODO:假设只发生一个failure
+                while(count < 4 && !timer.timeout) {
+                    count = registerListener(socket, resultSet);
+                }
+            } catch (Exception e) {
 //            e.printStackTrace();
-        } finally {
-            socket.close();
-        }
+            } finally {
+                socket.close();
+            }
 
 
-        if (resultSet.size() < 4){
-            tellRMCrash(resultSet);
+            if (resultSet.size() < 4){
+                tellRMCrash(resultSet);
+            }
+            return majority(resultSet);
         }
-        return majority(resultSet);
     }
 
     @Override
     public String removeCourse(String courseId, String semester) {
-       //TODO:在此处的msg中添加department信息
-        String department = courseId.substring(0,4);
-        Map<String, String> resultSet = new HashMap<>();
-        DatagramSocket socket = null;
-        int count = 0;
-        StringBuilder sb = new StringBuilder();
+        synchronized (this){
+            //TODO:在此处的msg中添加department信息
+            String department = courseId.substring(0,4);
+            Map<String, String> resultSet = new HashMap<>();
+            DatagramSocket socket = null;
+            int count = 0;
+            StringBuilder sb = new StringBuilder();
 
-        try {
-            socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
+            try {
+                socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
 
-            sendRequest(sb.append(department)
-                    .append(":")
-                    .append("removeCourse")
-                    .append(" ")
-                    .append(courseId)
-                    .append(" ")
-                    .append(semester).toString());
+                sendRequest(sb.append(department)
+                        .append(":")
+                        .append("removeCourse")
+                        .append(" ")
+                        .append(courseId)
+                        .append(" ")
+                        .append(semester).toString());
 
-            FE.Timer timer = new FE.Timer(socket,false);
-            Thread thread = new Thread(timer);
-            thread.start();
-            //TODO:假设只发生一个failure
-            while(count < 4 && !timer.timeout) {
-                count = registerListener(socket, resultSet);
+                FE.Timer timer = new FE.Timer(socket,false);
+                Thread thread = new Thread(timer);
+                thread.start();
+                //TODO:假设只发生一个failure
+                while(count < 4 && !timer.timeout) {
+                    count = registerListener(socket, resultSet);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                socket.close();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            socket.close();
-        }
 
 
-        if (resultSet.size() < 4){
-            tellRMCrash(resultSet);
+            if (resultSet.size() < 4){
+                tellRMCrash(resultSet);
+            }
+            return majority(resultSet);
         }
-        return majority(resultSet);
     }
 
     @Override
     public String[] listCourseAvailability(String semester){
-        //TODO:在此处的msg中添加department信息
-        String department = "comp";
-        Map<String, String> resultSet = new HashMap<>();
-        DatagramSocket socket = null;
-        int count = 0;
-        StringBuilder sb = new StringBuilder();
+        synchronized (this){
+            //TODO:在此处的msg中添加department信息
+            String department = "comp";
+            Map<String, String> resultSet = new HashMap<>();
+            DatagramSocket socket = null;
+            int count = 0;
+            StringBuilder sb = new StringBuilder();
 
-        try {
-            socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
-            sendRequest(sb.append(department)
-                    .append(":")
-                    .append("listCourseAvailability")
-                    .append(" ")
-                    .append(semester).toString());
+            try {
+                socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
+                sendRequest(sb.append(department)
+                        .append(":")
+                        .append("listCourseAvailability")
+                        .append(" ")
+                        .append(semester).toString());
 
-            FE.Timer timer = new FE.Timer(socket,false);
-            Thread thread = new Thread(timer);
-            thread.start();
-            //TODO:假设只发生一个failure
-            while(count < 4 && !timer.timeout) {
-                count = registerListener(socket, resultSet);
+                FE.Timer timer = new FE.Timer(socket,false);
+                Thread thread = new Thread(timer);
+                thread.start();
+                //TODO:假设只发生一个failure
+                while(count < 4 && !timer.timeout) {
+                    count = registerListener(socket, resultSet);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                socket.close();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            socket.close();
-        }
 
-        if (resultSet.size() < 4){
-            tellRMCrash(resultSet);
+            if (resultSet.size() < 4){
+                tellRMCrash(resultSet);
+            }
+            return majority(resultSet).split(" ");
         }
-        return majority(resultSet).split(" ");
     }
 
     @Override
     public String enrolCourse(String studentId, String courseId, String semester){
-        String department = studentId.substring(0,4);
-        Map<String, String> resultSet = new HashMap<>();
-        DatagramSocket socket = null;
-        int count = 0;
-        StringBuilder sb = new StringBuilder();
+        synchronized (this){
+            String department = studentId.substring(0,4);
+            Map<String, String> resultSet = new HashMap<>();
+            DatagramSocket socket = null;
+            int count = 0;
+            StringBuilder sb = new StringBuilder();
 
-        try{
-            socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
-            sendRequest(sb.append(department)
-                    .append(":")
-                    .append("enrolCourse")
-                    .append(" ")
-                    .append(studentId)
-                    .append(" ")
-                    .append(courseId)
-                    .append(" ")
-                    .append(semester).toString());
+            try{
+                socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
+                sendRequest(sb.append(department)
+                        .append(":")
+                        .append("enrolCourse")
+                        .append(" ")
+                        .append(studentId)
+                        .append(" ")
+                        .append(courseId)
+                        .append(" ")
+                        .append(semester).toString());
 
-            FE.Timer timer = new FE.Timer(socket,false);
-            Thread thread = new Thread(timer);
-            thread.start();
-            //TODO:假设只发生一个failure
-            while(count < 4 && !timer.timeout) {
-                count = registerListener(socket, resultSet);
+                FE.Timer timer = new FE.Timer(socket,false);
+                Thread thread = new Thread(timer);
+                thread.start();
+                //TODO:假设只发生一个failure
+                while(count < 4 && !timer.timeout) {
+                    count = registerListener(socket, resultSet);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                socket.close();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            socket.close();
-        }
 
 
-        if (resultSet.size() < 4){
-            tellRMCrash(resultSet);
+            if (resultSet.size() < 4){
+                tellRMCrash(resultSet);
+            }
+            return majority(resultSet);
         }
-        return majority(resultSet);
     }
 
     @Override
     public String dropCourse(String studentId, String courseId) {
-        String department = studentId.substring(0,4);
-        Map<String, String> resultSet = new HashMap<>();
-        DatagramSocket socket = null;
-        int count = 0;
-        StringBuilder sb = new StringBuilder();
+        synchronized (this){
+            String department = studentId.substring(0,4);
+            Map<String, String> resultSet = new HashMap<>();
+            DatagramSocket socket = null;
+            int count = 0;
+            StringBuilder sb = new StringBuilder();
 
-        try{
-            socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
-            sendRequest(sb.append(department)
-                    .append(":")
-                    .append("dropCourse")
-                    .append(" ")
-                    .append(studentId)
-                    .append(" ")
-                    .append(courseId).toString());
+            try{
+                socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
+                sendRequest(sb.append(department)
+                        .append(":")
+                        .append("dropCourse")
+                        .append(" ")
+                        .append(studentId)
+                        .append(" ")
+                        .append(courseId).toString());
 
-            FE.Timer timer = new FE.Timer(socket,false);
-            Thread thread = new Thread(timer);
-            thread.start();
-            //TODO:假设只发生一个failure
-            while(count < 4 && !timer.timeout) {
-                count = registerListener(socket, resultSet);
+                FE.Timer timer = new FE.Timer(socket,false);
+                Thread thread = new Thread(timer);
+                thread.start();
+                //TODO:假设只发生一个failure
+                while(count < 4 && !timer.timeout) {
+                    count = registerListener(socket, resultSet);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                socket.close();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            socket.close();
-        }
 
-        if (resultSet.size() < 4){
-            tellRMCrash(resultSet);
+            if (resultSet.size() < 4){
+                tellRMCrash(resultSet);
+            }
+            return majority(resultSet);
         }
-        return majority(resultSet);
     }
 
     @Override
     public String[] getClassSchedule(String studentId) {
-        String department = studentId.substring(0,4);
-        Map<String, String> resultSet = new HashMap<>();
-        DatagramSocket socket = null;
-        int count = 0;
-        StringBuilder sb = new StringBuilder();
+        synchronized (this){
+            String department = studentId.substring(0,4);
+            Map<String, String> resultSet = new HashMap<>();
+            DatagramSocket socket = null;
+            int count = 0;
+            StringBuilder sb = new StringBuilder();
 
-        try{
-            socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
-            sendRequest(sb.append(department)
-                    .append(":")
-                    .append("getClassSchedule")
-                    .append(" ")
-                    .append(studentId).toString());
+            try{
+                socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
+                sendRequest(sb.append(department)
+                        .append(":")
+                        .append("getClassSchedule")
+                        .append(" ")
+                        .append(studentId).toString());
 
-            FE.Timer timer = new FE.Timer(socket,false);
-            Thread thread = new Thread(timer);
-            thread.start();
-            //TODO:假设只发生一个failure
-            while(count < 4 && !timer.timeout) {
-                count = registerListener(socket, resultSet);
+                FE.Timer timer = new FE.Timer(socket,false);
+                Thread thread = new Thread(timer);
+                thread.start();
+                //TODO:假设只发生一个failure
+                while(count < 4 && !timer.timeout) {
+                    count = registerListener(socket, resultSet);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                socket.close();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            socket.close();
-        }
 
-        if (resultSet.size() < 4){
-            tellRMCrash(resultSet);
+            if (resultSet.size() < 4){
+                tellRMCrash(resultSet);
+            }
+            return majority(resultSet).split(" ");
         }
-        return majority(resultSet).split(" ");
     }
 
     @Override
     public String swapCourse(String studentID, String newCourseID, String oldCourseID) {
-        String department = studentID.substring(0,4);
-        Map<String, String> resultSet = new HashMap<>();
-        DatagramSocket socket = null;
-        int count = 0;
-        StringBuilder sb = new StringBuilder();
+        synchronized (this){
+            String department = studentID.substring(0,4);
+            Map<String, String> resultSet = new HashMap<>();
+            DatagramSocket socket = null;
+            int count = 0;
+            StringBuilder sb = new StringBuilder();
 
-        try{
-            socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
-            sendRequest(sb.append(department)
-                    .append(":")
-                    .append("swapCourse")
-                    .append(" ")
-                    .append(studentID)
-                    .append(" ")
-                    .append(newCourseID)
-                    .append(" ")
-                    .append(oldCourseID).toString());
+            try{
+                socket = new DatagramSocket(FEPort.FE_PORT.FEPort);
+                sendRequest(sb.append(department)
+                        .append(":")
+                        .append("swapCourse")
+                        .append(" ")
+                        .append(studentID)
+                        .append(" ")
+                        .append(newCourseID)
+                        .append(" ")
+                        .append(oldCourseID).toString());
 
-            FE.Timer timer = new FE.Timer(socket,false);
-            Thread thread = new Thread(timer);
-            thread.start();
-            //TODO:假设只发生一个failure
-            while(count < 4 && !timer.timeout) {
-                count = registerListener(socket, resultSet);
+                FE.Timer timer = new FE.Timer(socket,false);
+                Thread thread = new Thread(timer);
+                thread.start();
+                //TODO:假设只发生一个failure
+                while(count < 4 && !timer.timeout) {
+                    count = registerListener(socket, resultSet);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                socket.close();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            socket.close();
-        }
 
-        if (resultSet.size() < 4){
-            tellRMCrash(resultSet);
+            if (resultSet.size() < 4){
+                tellRMCrash(resultSet);
+            }
+            return majority(resultSet);
         }
-        return majority(resultSet);
     }
 
     @Override
