@@ -57,6 +57,8 @@ public class FrontEndImpl extends FrontEndPOA {
             }
         } catch (Exception e) {
 //            e.printStackTrace();
+        } finally {
+            socket.close();
         }
 
 
@@ -95,6 +97,8 @@ public class FrontEndImpl extends FrontEndPOA {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            socket.close();
         }
 
 
@@ -169,6 +173,8 @@ public class FrontEndImpl extends FrontEndPOA {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            socket.close();
         }
 
 
@@ -205,6 +211,8 @@ public class FrontEndImpl extends FrontEndPOA {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            socket.close();
         }
 
         if (resultSet.size() < 4){
@@ -238,6 +246,8 @@ public class FrontEndImpl extends FrontEndPOA {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            socket.close();
         }
 
         if (resultSet.size() < 4){
@@ -275,6 +285,8 @@ public class FrontEndImpl extends FrontEndPOA {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            socket.close();
         }
 
         if (resultSet.size() < 4){
