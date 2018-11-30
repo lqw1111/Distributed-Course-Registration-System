@@ -1,37 +1,55 @@
 package ReplicaHost2.DCRS;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Course {
-    public boolean login;
-    public String CourseName;
-    public String semester;
-    public final int capacity = 2;
-    public int enrollNumber;
-    public int availability;
-    public List<String> studentList = new ArrayList<>();
+    private String courseName;
+    private String department;
+    private int capacity;
+    private ArrayList<String> studentList;
+    private String semester;
 
-    public Course(String courseName, String semester) {
-        CourseName = courseName;
-        this.semester = semester;
+    public Course(String courseName) {
+        this.courseName = courseName;
+        this.capacity = 2;
+        studentList = new ArrayList<>();
     }
 
-    public boolean isLogin() {
-        return login;
+    public void resetCourse(){
+        department = "";
+        capacity = 0;
+        studentList.clear();
+        semester = "";
     }
 
-    public void setLogin(boolean login) {
-        this.login = login;
+    public String getDepartment() {
+        department = courseName.substring(0, 4);
+        return department;
+    }
+
+    public ArrayList<String> getStudentList() {
+        return studentList;
+    }
+
+    public void setStudentList(ArrayList<String> studentList) {
+        this.studentList = studentList;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void increaseCapacity() {
+        this.capacity++;
+    }
+
+    public void decreaseCapacity() {
+        this.capacity--;
     }
 
     public String getCourseName() {
-        return CourseName;
-    }
-
-    public void setCourseName(String courseName) {
-        CourseName = courseName;
+        return courseName;
     }
 
     public String getSemester() {
@@ -40,33 +58,5 @@ public class Course {
 
     public void setSemester(String semester) {
         this.semester = semester;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public int getEnrollNumber() {
-        return enrollNumber;
-    }
-
-    public void setEnrollNumber(int enrollNumber) {
-        this.enrollNumber = enrollNumber;
-    }
-
-    public int getAvailability() {
-        return availability;
-    }
-
-    public void setAvailability(int availability) {
-        this.availability = availability;
-    }
-
-    public List<String> getStudentList() {
-        return studentList;
-    }
-
-    public void setStudentList(List<String> studentList) {
-        this.studentList = studentList;
     }
 }
