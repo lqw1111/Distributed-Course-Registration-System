@@ -1,13 +1,16 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
+
 package ReplicaHost4.DCRS;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.List;
 
-public class UdpWokerThread implements Runnable{
-
+public class UdpWokerThread implements Runnable {
     DatagramSocket socket = null;
     DatagramPacket packet = null;
     DCRSImpl servent = null;
@@ -18,65 +21,55 @@ public class UdpWokerThread implements Runnable{
         this.servent = servent;
     }
 
-    @Override
     public void run() {
         String info = null;
         InetAddress address = null;
         int port = 8800;
         byte[] data2 = null;
         DatagramPacket packet2 = null;
+
         try {
-            info = new String(packet.getData(), 0, packet.getLength());
-//            System.out.println("我是服务器，客户端说："+info);
-
+            info = new String(this.packet.getData(), 0, this.packet.getLength());
             String[] command = info.split(" ");
-
             String result = "";
 
             switch(command[0]) {
-                case "listCourseAvailability" :
-                    List<String> courseList = servent.getLocalCourseList(command[1]);
-                    for (String course :
-                            courseList) {
-                        result = result + course + " ";
-                    }
+                case DCRSImpl.REQUEST_ENROLL:
+                    result = this.servent.database.enrolCourse(command[1], command[2], command[3]);;
                     break;
-                case "enrolCourse" :
-                    result = servent.enrolCourse(command[1],command[2],command[3]);
+                case DCRSImpl.REQUEST_RECORD:
+                    result = this.servent.database.getClassSchedule(command[1]);
                     break;
-                case "dropCourse" :
-                    result = servent.dropLocalCourse(command[1],command[2],command[3]);
+                case DCRSImpl.REQUEST_ENROLLED_COUNT:
+                    result = this.servent.database.getStudentRecord(command[1], command[2]);
                     break;
-                case "dropRemovedCourseFromStuCourList" :
-                    result = servent.dropRemovedCourseFromStuCourList(command[1]);
+                case DCRSImpl.REQUEST_DROP:
+                    result = this.servent.database.dropCourse(command[1], command[2]);
                     break;
-                case "checkDropAndEnroll" :
-                    result = servent.checkDropAndEnroll(command[1], command[2],command[3],command[4]);
+                case DCRSImpl.REQUEST_OLDCOURSE_STATUS:
+                    result = this.servent.database.checkOldCourse(command[1], command[2]);
                     break;
-                case "checkWhetherCanEnrollAndEnroll" :
-                    result = servent.checkWhetherCanEnrollAndEnroll(command[1],command[2], command[3]);
+                case DCRSImpl.REQUEST_AVAILABILITY:
+                    result = this.servent.database.listCourseAvailability(command[1]);
                     break;
-                case "checkEnroll" :
-                    result = servent.checkEnroll(command[1],command[2],command[3],command[4]);
+                case DCRSImpl.REQUEST_ENROL_AVAIL:
+                    result = this.servent.database.checkEnrolAvail(command[1], command[2]);
                     break;
-                case "dropOldCourse" :
-                    result = servent.dropOldCourse(command[1],command[2],command[3]);
-                    break;
-                default :
-                    System.out.println("Invalid Command!");
+                case DCRSImpl.REQUEST_NEWCOURSE_STATUS:
+                    result = this.servent.database.checkNewCourse(command[1], command[2]);
             }
 
-            address = packet.getAddress();
-            port = packet.getPort();
+            address = this.packet.getAddress();
+            port = this.packet.getPort();
 
             data2 = result.getBytes();
             packet2 = new DatagramPacket(data2, data2.length, address, port);
             socket.send(packet2);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException var10) {
+            var10.printStackTrace();
+        } catch (Exception var11) {
+            var11.printStackTrace();
         }
-        //socket.close();不能关闭
+
     }
 }
