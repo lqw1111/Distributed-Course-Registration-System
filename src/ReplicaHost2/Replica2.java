@@ -1,9 +1,9 @@
 package ReplicaHost2;
 
 import ReplicaHost2.DCRS.DCRSImpl;
-import ReplicaHost2.DCRS.DCRSWrong;
-import ReplicaHost2.DCRS.UdpWokerThread;
+import ReplicaHost2.DCRS.UdpServer;
 import ReplicaHost2.Log.LoggerFormatter;
+import ReplicaHost2.DCRS.DCRSWrong;
 import java.io.IOException;
 import java.net.*;
 import java.util.logging.FileHandler;
@@ -108,23 +108,8 @@ public class Replica2 {
     }
 
     public void startUdpServer(int udpPort, DCRSImpl department) throws IOException {
-        DatagramSocket socket = new DatagramSocket(udpPort);
-        DatagramPacket packet = null;
-        byte[] data = null;
-
-        logger.info(" Upd Server Start");
-        while(true)
-        {
-            data = new byte[1024];
-            packet = new DatagramPacket(data, data.length);
-            socket.receive(packet);
-
-            logger.info("Server Recv Message :" + new String(packet.getData(), 0, packet.getLength()));
-
-            Thread thread = new Thread(new UdpWokerThread(socket, packet, department));
-            thread.start();
-
-        }
+        Thread thread = new Thread(new UdpServer(udpPort, department));
+        thread.start();
     }
 
     public void startSoftFailPort(int port) throws IOException {
