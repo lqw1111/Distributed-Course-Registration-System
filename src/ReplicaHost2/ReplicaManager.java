@@ -2,7 +2,7 @@ package ReplicaHost2;
 
 import PortInfo.FEPort;
 import PortInfo.Replica;
-import ReplicaHost1.Log.LoggerFormatter;
+import ReplicaHost2.Log.LoggerFormatter;
 import java.io.IOException;
 import java.net.*;
 import java.util.Comparator;

@@ -8,7 +8,6 @@ import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
-
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
