@@ -3,7 +3,6 @@ package Client;
 import FrontEndCorba.FrontEnd;
 import ReplicaHost1.DCRS.certificateIdentity;
 import ReplicaHost1.Log.LoggerFormatter;
-
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Scanner;

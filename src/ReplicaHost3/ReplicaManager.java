@@ -2,12 +2,7 @@ package ReplicaHost3;
 
 import PortInfo.FEPort;
 import PortInfo.Replica;
-import PortInfo.SequencerPort;
-import ReplicaHost1.Log.LoggerFormatter;
-import ReplicaHost1.Replica1;
-import ReplicaHost4.Replica4;
-
-import javax.swing.plaf.TableHeaderUI;
+import ReplicaHost3.Log.LoggerFormatter;
 import java.io.IOException;
 import java.net.*;
 import java.util.Comparator;
@@ -63,6 +58,7 @@ public class ReplicaManager {
 
                 //TODO:log software failure
                 logger.info("RM_" + ReplicaId + " SoftWareFailure");
+                TellSoftWareFail(ReplicaHost3.ReplicaPort.REPLICA_PORT.softwareFail);
 
             } else if (receiveMessage.indexOf(Failure.ServerCrash.toString()) != -1){
 
@@ -80,6 +76,14 @@ public class ReplicaManager {
                 moveToHoldBackQueue(recvMsg);
             }
         }
+    }
+
+    private void TellSoftWareFail(int softwarePort) throws IOException {
+        InetAddress address = InetAddress.getByName("localhost");
+        byte[] data = "SoftwareFailure".getBytes();
+        DatagramPacket packet = new DatagramPacket(data, 0 , data.length , address , softwarePort);
+        DatagramSocket socket = new DatagramSocket();
+        socket.send(packet);
     }
 
     private void moveToHoldBackQueue(Message recvMsg) throws IOException {
@@ -301,6 +305,7 @@ enum ReplicaPort {
     REPLICA_PORT;
     final int port = 3333;
     final int backUpPort = 8083;
+    final int softwareFail = 8883;
 }
 
 enum RMPortInfo{
