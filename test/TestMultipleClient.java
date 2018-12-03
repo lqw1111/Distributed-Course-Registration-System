@@ -139,9 +139,52 @@ public class TestMultipleClient {
         thread5.start();
     }
 
+    public static void checkdeadlock(){
+        FrontEnd servent1 = connect("frontEnd");
+
+        Runnable t1 = () -> {
+            System.out.println(servent1.addCourse("comp4","fall"));
+        };
+
+        Runnable t2 = () -> {
+            System.out.println(servent1.addCourse("comp5","fall"));
+        };
+
+        Runnable t3 = () -> {
+            System.out.println(servent1.enrolCourse("comps4444","comp4","fall"));
+        };
+
+        Runnable t4 = () -> {
+            System.out.println(servent1.enrolCourse("comps5555","comp5","fall"));
+        };
+
+        Runnable t5 = () -> {
+            System.out.println(servent1.swapCourse("comps4444","comp5","comp4"));
+        };
+
+        Runnable t6 = () -> {
+            System.out.println(servent1.swapCourse("comps5555","comp4","comp5"));
+        };
+
+        Thread thread1 = new Thread(t1);
+        Thread thread2 = new Thread(t2);
+        Thread thread3 = new Thread(t3);
+        Thread thread4 = new Thread(t4);
+        Thread thread5 = new Thread(t5);
+        Thread thread6 = new Thread(t6);
+
+        thread1.start();
+        thread2.start();
+        thread3.start();
+        thread4.start();
+        thread5.start();
+        thread6.start();
+    }
+
     public static void main(String[] args) {
-        s1();
-        s2();
-        s3();
+//        s1();
+//        s2();
+//        s3();
+        checkdeadlock();
     }
 }
